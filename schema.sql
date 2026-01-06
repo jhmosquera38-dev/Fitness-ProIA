@@ -399,11 +399,6 @@ ALTER TABLE public.workout_logs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users manage their workout logs" ON public.workout_logs;
 CREATE POLICY "Users manage their workout logs" ON public.workout_logs USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
--- COMMENTS (If table referenced in userService)
-CREATE TABLE IF NOT EXISTS public.comments (
-    id SERIAL PRIMARY KEY,
-    activity_id INTEGER REFERENCES public.social_activities(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     content TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -412,3 +407,29 @@ DROP POLICY IF EXISTS "Public read comments" ON public.comments;
 CREATE POLICY "Public read comments" ON public.comments FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Users create comments" ON public.comments;
 CREATE POLICY "Users create comments" ON public.comments FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- ============================================================================
+-- 8. MÚSICA FITNESS (NEW)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.music_tracks (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    artist TEXT,
+    platform TEXT DEFAULT 'YouTube', 
+    url TEXT NOT NULL,
+    category TEXT NOT NULL, 
+    bpm INTEGER,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+ALTER TABLE public.music_tracks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public view music" ON public.music_tracks;
+CREATE POLICY "Public view music" ON public.music_tracks FOR SELECT USING (true);
+
+-- SEED DATA MÚSICA
+INSERT INTO public.music_tracks (title, artist, platform, url, category, bpm)
+VALUES 
+('Blinding Lights', 'The Weeknd', 'YouTube', 'https://www.youtube.com/watch?v=4NRXx6U8ABQ', 'cardio_hiit', 171),
+('Eye of the Tiger', 'Survivor', 'YouTube', 'https://www.youtube.com/watch?v=btPJPFnesV4', 'fuerza', 109),
+('Can''t Stop', 'Red Hot Chili Peppers', 'YouTube', 'https://www.youtube.com/watch?v=BfOdWSiyWoc', 'running_cycling', 134),
+('Weightless', 'Marconi Union', 'YouTube', 'https://www.youtube.com/watch?v=UfcAVejslrU', 'yoga_recovery', 60);
+
