@@ -53,9 +53,7 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
         }
     };
 
-    const containerClass = isOpen
-        ? "opacity-100 pointer-events-auto translate-y-0"
-        : "opacity-0 pointer-events-none -translate-y-2";
+
 
     const currentTracks = catalog ? catalog[activeCategory] : [];
 
@@ -72,8 +70,23 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                 <div className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px] md:hidden" onClick={onClose} />
             )}
 
-            <div className={`fixed inset-0 md:inset-auto md:absolute md:top-16 md:right-10 w-full md:w-96 z-50 transition-all duration-300 ease-in-out transform origin-top-right ${containerClass}`}>
-                <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-t md:border border-slate-200 dark:border-slate-700 md:rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full md:h-auto md:max-h-[80vh] mt-16 md:mt-0">
+
+
+            {/* Desktop Container (Pop-over) & Mobile Logic Unification */}
+            {/* Actually, let's keep one div but switch classes entirely */}
+            <div className={`
+                z-[100] transition-all duration-300 ease-in-out
+                ${/* Mobile Styles */ ''}
+                fixed inset-x-0 bottom-0 top-16 md:top-auto md:bottom-auto md:inset-x-auto
+                ${/* Desktop Styles */ ''}
+                md:absolute md:top-16 md:right-10 md:w-96
+                ${/* Visibility/Transform State */ ''}
+                ${isOpen
+                    ? 'translate-y-0 opacity-100 pointer-events-auto'
+                    : 'translate-y-4 md:translate-y-0 md:opacity-0 pointer-events-none'
+                }
+            `}>
+                <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-t md:border border-slate-200 dark:border-slate-700 md:rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full md:h-auto md:max-h-[80vh]">
 
                     {/* Header */}
                     <div className="p-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex justify-between items-center flex-shrink-0">
