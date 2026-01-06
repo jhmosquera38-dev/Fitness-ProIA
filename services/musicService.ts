@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '../src/lib/supabaseClient';
 
 export interface MusicTrack {
     id: string | number;

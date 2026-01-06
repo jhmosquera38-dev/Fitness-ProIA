@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { musicService, MusicCatalog, MusicTrack } from '../services/musicService';
 
 interface MusicWidgetProps {
@@ -123,8 +123,8 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                                 key={cat.key}
                                 onClick={() => setActiveCategory(cat.key)}
                                 className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${activeCategory === cat.key
-                                        ? 'bg-brand-primary text-slate-900'
-                                        : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                                    ? 'bg-brand-primary text-slate-900'
+                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                                     }`}
                             >
                                 <span>{cat.icon}</span>
