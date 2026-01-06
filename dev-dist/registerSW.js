@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/Fitness-ProIA/dev-sw.js?dev-sw', { scope: '/Fitness-ProIA/', type: 'classic' })
