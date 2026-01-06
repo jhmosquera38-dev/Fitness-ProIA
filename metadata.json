@@ -1,0 +1,8 @@
+{
+  "name": "Copy of Fitness Pro - Entrenador IA",
+  "description": "Un generador de entrenamientos inteligente impulsado por IA que crea planes de entrenamiento hiper-personalizados basados en tus objetivos, experiencia y equipo disponible. La funcionalidad principal para el usuario de la plataforma SaaS FitnessFlow Pro.",
+  "requestFramePermissions": [
+    "microphone",
+    "geolocation"
+  ]
+}
