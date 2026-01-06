@@ -14,20 +14,28 @@ export type MusicCatalog = Record<MusicTrack['category'], MusicTrack[]>;
 
 const DEFAULT_CATALOG: MusicCatalog = {
     cardio_hiit: [
-        { id: 'c1', title: 'Best Workout Music 2025', artist: 'Max Oazo Mix', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=I6PPdlxvO90', category: 'cardio_hiit', bpm: 130 },
-        { id: 'c2', title: 'Gym Workout Best Songs', artist: 'EDM Mix 2025', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=rpLRfvXzbMw', category: 'cardio_hiit', bpm: 128 },
-        { id: 'c3', title: '35 Top Hits Workout Remix', artist: 'Workout Music Source', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=5bC-1-3L4X4', category: 'cardio_hiit', bpm: 140 },
-        { id: 'c4', title: '1 Hour of Pop Workout Songs', artist: 'Pop Hits Mix', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=rC5S9eF-d9o', category: 'cardio_hiit', bpm: 135 },
-        { id: 'c5', title: 'Blinding Lights', artist: 'The Weeknd', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=4NRXx6U8ABQ', category: 'cardio_hiit', bpm: 171 },
-        { id: 'c6', title: 'Motivation Mix 2025', artist: 'Fitness Station', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=613eVDWmL6w', category: 'cardio_hiit', bpm: 128 }
+        { id: 'ch1', title: 'Houdini', artist: 'Dua Lipa', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=L0c5RqhlJg4', category: 'cardio_hiit', bpm: 117 },
+        { id: 'ch2', title: 'Espresso', artist: 'Sabrina Carpenter', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=3n1Jb_t9BBU', category: 'cardio_hiit', bpm: 110 },
+        { id: 'ch3', title: 'Greedy', artist: 'Tate McRae', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=C2_xH647s4g', category: 'cardio_hiit', bpm: 111 },
+        { id: 'ch4', title: 'Lil Boo Thang', artist: 'Paul Russell', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=j_H3G03s9Y8', category: 'cardio_hiit', bpm: 114 },
+        { id: 'ch5', title: 'Padam Padam', artist: 'Kylie Minogue', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=q_0E733w_tU', category: 'cardio_hiit', bpm: 128 },
+        { id: 'ch6', title: 'Miracle', artist: 'Calvin Harris', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=eG1s18-h-pU', category: 'cardio_hiit', bpm: 143 },
+        { id: 'ch7', title: 'Rush', artist: 'Troye Sivan', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=G2_h94NnQ0Q', category: 'cardio_hiit', bpm: 126 },
+        { id: 'ch8', title: 'Dance The Night', artist: 'Dua Lipa', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=Cp-CKX_CNIE', category: 'cardio_hiit', bpm: 110 },
+        { id: 'ch9', title: 'Texas Hold \'Em', artist: 'Beyoncé', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=yYn-h3_g-6c', category: 'cardio_hiit', bpm: 110 },
+        { id: 'ch10', title: 'Water', artist: 'Tyla', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=o8jG8fK2k64', category: 'cardio_hiit', bpm: 117 },
+        { id: 'ch11', title: 'I\'m Good (Blue)', artist: 'David Guetta', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=J7jW07kC_9M', category: 'cardio_hiit', bpm: 128 }
     ],
     fuerza: [
-        { id: 'f1', title: 'Strength Training Hits', artist: 'Workout Music Source', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=lK5z-K42f0A', category: 'fuerza', bpm: 124 },
-        { id: 'f2', title: 'Gym Motivation Top Songs', artist: 'Fearless Motivation', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=5W7oQ_oW_4Q', category: 'fuerza', bpm: 110 },
-        { id: 'f3', title: 'Fitness & Gym Motivation', artist: 'Mix 2025', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=j2n_1K9rVbY', category: 'fuerza', bpm: 120 },
-        { id: 'f4', title: 'Hard Hitting Gym Music', artist: 'Barbell Nation', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=gX-hUoJ3c5w', category: 'fuerza', bpm: 130 },
-        { id: 'f5', title: 'Eye of the Tiger', artist: 'Survivor', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=btPJPFnesV4', category: 'fuerza', bpm: 109 },
-        { id: 'f6', title: 'Till I Collapse', artist: 'Eminem', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=Obim8BYGnOE', category: 'fuerza', bpm: 171 }
+        { id: 'fz1', title: 'Till I Collapse', artist: 'Eminem', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=ytQ5CYE1VZw', category: 'fuerza', bpm: 171 },
+        { id: 'fz2', title: 'Dreams and Nightmares', artist: 'Meek Mill', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=ZlP7Y_bS1_Q', category: 'fuerza', bpm: 83 },
+        { id: 'fz3', title: 'Humble.', artist: 'Kendrick Lamar', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=tvTRZJ-4EyI', category: 'fuerza', bpm: 150 },
+        { id: 'fz4', title: 'First Person Shooter', artist: 'Drake ft. J. Cole', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=pYg1aV0n4sY', category: 'fuerza', bpm: 82 },
+        { id: 'fz5', title: 'Win', artist: 'Jay Rock', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=jrLhF3tM3rY', category: 'fuerza', bpm: 149 },
+        { id: 'fz6', title: 'Rich Flex', artist: 'Drake & 21 Savage', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=I4DjHHVHWAE', category: 'fuerza', bpm: 154 },
+        { id: 'fz7', title: 'Going Bad', artist: 'Meek Mill ft. Drake', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=3u_F6ZfS7e8', category: 'fuerza', bpm: 86 },
+        { id: 'fz8', title: 'POWER', artist: 'Kanye West', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=L53gjP-TtGE', category: 'fuerza', bpm: 154 },
+        { id: 'fz9', title: 'Black Skinhead', artist: 'Kanye West', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=q604eed4ad0', category: 'fuerza', bpm: 130 }
     ],
     running_cycling: [
         { id: 'r1', title: '40 Best Running Songs 2024', artist: 'Power Music', platform: 'YouTube', url: 'https://www.youtube.com/watch?v=fRj6P2uG9gI', category: 'running_cycling', bpm: 170 },

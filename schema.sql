@@ -429,30 +429,39 @@ CREATE POLICY "Public view music" ON public.music_tracks FOR SELECT USING (true)
 INSERT INTO public.music_tracks (title, artist, platform, url, category, bpm)
 VALUES 
 -- Cardio / HIIT
+('Houdini', 'Dua Lipa', 'YouTube', 'https://www.youtube.com/watch?v=L0c5RqhlJg4', 'cardio_hiit', 117),
+('Espresso', 'Sabrina Carpenter', 'YouTube', 'https://www.youtube.com/watch?v=3n1Jb_t9BBU', 'cardio_hiit', 110),
+('Greedy', 'Tate McRae', 'YouTube', 'https://www.youtube.com/watch?v=C2_xH647s4g', 'cardio_hiit', 111),
+('Lil Boo Thang', 'Paul Russell', 'YouTube', 'https://www.youtube.com/watch?v=j_H3G03s9Y8', 'cardio_hiit', 114),
+('Padam Padam', 'Kylie Minogue', 'YouTube', 'https://www.youtube.com/watch?v=q_0E733w_tU', 'cardio_hiit', 128),
+('Miracle', 'Calvin Harris', 'YouTube', 'https://www.youtube.com/watch?v=eG1s18-h-pU', 'cardio_hiit', 143),
+('Rush', 'Troye Sivan', 'YouTube', 'https://www.youtube.com/watch?v=G2_h94NnQ0Q', 'cardio_hiit', 126),
+('Dance The Night', 'Dua Lipa', 'YouTube', 'https://www.youtube.com/watch?v=Cp-CKX_CNIE', 'cardio_hiit', 110),
+('Texas Hold ''Em', 'Beyoncé', 'YouTube', 'https://www.youtube.com/watch?v=yYn-h3_g-6c', 'cardio_hiit', 110),
+('Water', 'Tyla', 'YouTube', 'https://www.youtube.com/watch?v=o8jG8fK2k64', 'cardio_hiit', 117),
+('I''m Good (Blue)', 'David Guetta', 'YouTube', 'https://www.youtube.com/watch?v=J7jW07kC_9M', 'cardio_hiit', 128),
 ('Best Workout Music 2025', 'Max Oazo Mix', 'YouTube', 'https://www.youtube.com/watch?v=I6PPdlxvO90', 'cardio_hiit', 130),
-('Gym Workout Best Songs', 'EDM Mix 2025', 'YouTube', 'https://www.youtube.com/watch?v=rpLRfvXzbMw', 'cardio_hiit', 128),
-('35 Top Hits Workout Remix', 'Workout Music Source', 'YouTube', 'https://www.youtube.com/watch?v=5bC-1-3L4X4', 'cardio_hiit', 140),
-('1 Hour of Pop Workout Songs', 'Pop Hits Mix', 'YouTube', 'https://www.youtube.com/watch?v=rC5S9eF-d9o', 'cardio_hiit', 135),
-('Blinding Lights', 'The Weeknd', 'YouTube', 'https://www.youtube.com/watch?v=4NRXx6U8ABQ', 'cardio_hiit', 171),
-('Motivation Mix 2025', 'Fitness Station', 'YouTube', 'https://www.youtube.com/watch?v=613eVDWmL6w', 'cardio_hiit', 128),
 
--- Fuerza
-('Strength Training Hits', 'Workout Music Source', 'YouTube', 'https://www.youtube.com/watch?v=lK5z-K42f0A', 'fuerza', 124),
-('Gym Motivation Top Songs', 'Fearless Motivation', 'YouTube', 'https://www.youtube.com/watch?v=5W7oQ_oW_4Q', 'fuerza', 110),
-('Fitness & Gym Motivation', 'Mix 2025', 'YouTube', 'https://www.youtube.com/watch?v=j2n_1K9rVbY', 'fuerza', 120),
-('Hard Hitting Gym Music', 'Barbell Nation', 'YouTube', 'https://www.youtube.com/watch?v=gX-hUoJ3c5w', 'fuerza', 130),
+-- Fuerza (Hip Hop & Rock)
+('Till I Collapse', 'Eminem', 'YouTube', 'https://www.youtube.com/watch?v=ytQ5CYE1VZw', 'fuerza', 171),
+('Dreams and Nightmares', 'Meek Mill', 'YouTube', 'https://www.youtube.com/watch?v=ZlP7Y_bS1_Q', 'fuerza', 83),
+('Humble.', 'Kendrick Lamar', 'YouTube', 'https://www.youtube.com/watch?v=tvTRZJ-4EyI', 'fuerza', 150),
+('First Person Shooter', 'Drake ft. J. Cole', 'YouTube', 'https://www.youtube.com/watch?v=pYg1aV0n4sY', 'fuerza', 82),
+('Win', 'Jay Rock', 'YouTube', 'https://www.youtube.com/watch?v=jrLhF3tM3rY', 'fuerza', 149),
+('Rich Flex', 'Drake & 21 Savage', 'YouTube', 'https://www.youtube.com/watch?v=I4DjHHVHWAE', 'fuerza', 154),
+('Going Bad', 'Meek Mill', 'YouTube', 'https://www.youtube.com/watch?v=3u_F6ZfS7e8', 'fuerza', 86),
+('POWER', 'Kanye West', 'YouTube', 'https://www.youtube.com/watch?v=L53gjP-TtGE', 'fuerza', 154),
+('Black Skinhead', 'Kanye West', 'YouTube', 'https://www.youtube.com/watch?v=q604eed4ad0', 'fuerza', 130),
 ('Eye of the Tiger', 'Survivor', 'YouTube', 'https://www.youtube.com/watch?v=btPJPFnesV4', 'fuerza', 109),
+('Rock Workout Mix', 'Gym Motivation', 'YouTube', 'https://www.youtube.com/watch?v=1M4j-n0P9oQ', 'fuerza', 130),
 
--- Run / Ride
+-- Run / Ride (Hardstyle & High Tempo)
+('Hardstyle Pump Mix', 'Gym Rat Music', 'YouTube', 'https://www.youtube.com/watch?v=rpLRfvXzbMw', 'running_cycling', 160),
 ('40 Best Running Songs 2024', 'Power Music', 'YouTube', 'https://www.youtube.com/watch?v=fRj6P2uG9gI', 'running_cycling', 170),
-('Running High Tempo Mix', 'Workout Music Source', 'YouTube', 'https://www.youtube.com/watch?v=g7Q2R8nJt-U', 'running_cycling', 160),
 ('Can''t Stop', 'Red Hot Chili Peppers', 'YouTube', 'https://www.youtube.com/watch?v=BfOdWSiyWoc', 'running_cycling', 134),
-('Marathon Training Mix', 'Runner''s World', 'YouTube', 'https://www.youtube.com/watch?v=rC5S9eF-d9o', 'running_cycling', 150),
 
 -- Yoga / Recovery
 ('Ultimate Chill: Modern Yoga', 'Relaxing Music', 'YouTube', 'https://www.youtube.com/watch?v=_e_4jU_e8_4', 'yoga_recovery', 60),
 ('1 HOUR Best Yoga Music', 'YellowBrickCinema', 'YouTube', 'https://www.youtube.com/watch?v=q7bIe5h1-Rk', 'yoga_recovery', 50),
-('Peaceful Yoga Music', 'Buddha''s Lounge', 'YouTube', 'https://www.youtube.com/watch?v=kGjW9l5Xh9o', 'yoga_recovery', 45),
-('Weightless', 'Marconi Union', 'YouTube', 'https://www.youtube.com/watch?v=UfcAVejslrU', 'yoga_recovery', 60),
-('Deep Relaxation Mix', 'Soundings of the Planet', 'YouTube', 'https://www.youtube.com/watch?v=e_b4N3t97iI', 'yoga_recovery', 55);
+('Weightless', 'Marconi Union', 'YouTube', 'https://www.youtube.com/watch?v=UfcAVejslrU', 'yoga_recovery', 60);
 

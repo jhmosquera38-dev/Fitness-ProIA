@@ -72,8 +72,8 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                 <div className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px] md:hidden" onClick={onClose} />
             )}
 
-            <div className={`absolute top-16 right-0 md:right-10 w-80 md:w-96 z-50 transition-all duration-300 ease-in-out transform origin-top-right ${containerClass}`}>
-                <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div className={`fixed inset-0 md:inset-auto md:absolute md:top-16 md:right-10 w-full md:w-96 z-50 transition-all duration-300 ease-in-out transform origin-top-right ${containerClass}`}>
+                <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-t md:border border-slate-200 dark:border-slate-700 md:rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full md:h-auto md:max-h-[80vh] mt-16 md:mt-0">
 
                     {/* Header */}
                     <div className="p-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex justify-between items-center flex-shrink-0">
