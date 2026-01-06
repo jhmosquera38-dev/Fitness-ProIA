@@ -80,7 +80,7 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
             )}
 
             {/* Container - Fixed on both Mobile and Desktop (via Portal) */}
-            <div className={`
+            <div id="music-widget-portal" className={`
                 z-[9999] transition-all duration-300 ease-in-out
                 fixed inset-x-0 bottom-0 top-16 md:top-20 md:right-10 md:bottom-auto md:left-auto md:w-96
                 ${isOpen
