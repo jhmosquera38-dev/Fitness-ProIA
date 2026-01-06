@@ -9,8 +9,10 @@ lerna-debug.log*
 
 node_modules
 dist
-dist-ssr
-# *.local (Commented out to allow .env.local per user request)
+build_output
+.env
+.env.local
+.DS_Store
 
 # Editor directories and files
 .vscode/*

@@ -70,8 +70,8 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({ onClose, onSave, ini
     };
 
     return (
-        <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4 animate-fade-in" onClick={onClose}>
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/60 z-[60] flex justify-center items-center p-4 animate-fade-in" onClick={onClose}>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-[90%] md:w-full max-w-2xl max-h-[60vh] md:max-h-[90vh] mb-24 md:mb-0 flex flex-col" onClick={(e) => e.stopPropagation()}>
                 <form onSubmit={handleSubmit} className="flex flex-col h-full overflow-hidden">
                     <div className="p-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
                         <h2 className="text-xl font-bold text-slate-800 dark:text-white">

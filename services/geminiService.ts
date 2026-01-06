@@ -1,38 +1,29 @@
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { type UserProfile, type WorkoutPlan, type DailyCheckin, type AIInsight } from '../types';
 
 // ============================================================================
-// SERVICIO GEMINI (Migrated to @google/generative-ai for stability)
-// Se ha migrado al SDK estándar para garantizar compatibilidad con 'gemini-1.5-flash'.
-
-
+// SERVICIO GEMINI (Migrated to @google/genai for Gemini 2.0+ support)
+// Se ha migrado al nuevo SDK oficial para dar soporte a 'gemini-3-flash-preview'.
 
 // ============================================================================
 // SERVICIO GEMINI (Robust Configuration)
 // ============================================================================
 
-let genAI: GoogleGenerativeAI | null = null;
+let genAI: GoogleGenAI | null = null;
 try {
     // @ts-ignore
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (apiKey && typeof apiKey === 'string' && apiKey.length > 0) {
-        genAI = new GoogleGenerativeAI(apiKey);
+        genAI = new GoogleGenAI({ apiKey });
     }
 } catch (e) {
     console.warn("Gemini API client could not be initialized:", e);
 }
 
-// We use specific model versions to avoid 404s on generic aliases in some API regions/versions.
-// Primary: Gemini 1.5 Flash (Most stable for high frequency)
-// Fallback: Gemini 1.5 Pro (Higher capacity)
-// Last Resort: Gemini Pro (v1.0 stable)
-// Primary: Gemini 1.5 Flash (Most stable for high frequency)
-// Fallback: Gemini 1.5 Pro (Higher capacity)
-// Last Resort: Gemini 1.0 Pro (Stable Legacy)
-// Simplified Configuration: Exclusive Gemini 3 Flash Preview Usage
-// User Requirement: "Usar exclusivamente Gemini 3 Flash Preview" & "No artificial restrictions"
-
+// Latest Model Configuration (2026)
+// Primary: Gemini 3 Flash Preview (Latest high-speed model)
+// User Requirement: "Usar exclusivamente Gemini 3 Flash Preview"
 const PRIMARY_MODEL = "gemini-3-flash-preview";
 
 const generatePrompt = (profile: UserProfile, dailyStatus?: DailyCheckin): string => {
@@ -146,14 +137,14 @@ export const generateWorkoutPlan = async (profile: UserProfile, dailyStatus?: Da
 
     try {
         return await simpleGenerate(async (modelName) => {
-            const model = genAI!.getGenerativeModel({
-                model: modelName,
-                generationConfig: { responseMimeType: "application/json" }
-            });
-
             const prompt = generatePrompt(profile, dailyStatus) + "\n\nIMPORTANT: Return ONLY valid JSON.";
-            const result = await model.generateContent(prompt);
-            const text = result.response.text();
+
+            const result = await genAI!.models.generateContent({
+                model: modelName,
+                contents: prompt,
+                config: { responseMimeType: "application/json" }
+            });
+            const text = result.text || "";
 
             try {
                 // Clean markdown if present despite instructions
@@ -190,7 +181,6 @@ export const generateContextualInsight = async (status: DailyCheckin, userName: 
 
     try {
         return await simpleGenerate(async (modelName) => {
-            const model = genAI!.getGenerativeModel({ model: modelName });
             const prompt = `
             Analiza estado: Energía ${status.energyLevel}/10, Sueño ${status.sleepQuality}, Dolor ${status.soreness}, Ánimo ${status.mood}.
             Usuario: ${userName}.
@@ -198,8 +188,12 @@ export const generateContextualInsight = async (status: DailyCheckin, userName: 
             Response must be pure JSON.
             `;
 
-            const result = await model.generateContent(prompt);
-            const text = result.response.text().replace(/```json|```/g, '').trim();
+            const result = await genAI!.models.generateContent({
+                model: modelName,
+                contents: prompt,
+                config: { responseMimeType: "application/json" }
+            });
+            const text = (result.text || "").replace(/```json|```/g, '').trim();
             return JSON.parse(text) as AIInsight;
         });
     } catch (error) {
@@ -215,7 +209,6 @@ export const getAICoachResponse = async (prompt: string, userName: string = 'Usu
 
     try {
         return await simpleGenerate(async (modelName) => {
-            const model = genAI!.getGenerativeModel({ model: modelName });
             const systemInstruction = `
             Eres el AI Coach de FitnessFlow Pro.
             Estás hablando con ${userName}.
@@ -224,8 +217,12 @@ export const getAICoachResponse = async (prompt: string, userName: string = 'Usu
             `;
 
             const fullPrompt = `${systemInstruction}\n\nUser: ${prompt}`;
-            const result = await model.generateContent(fullPrompt);
-            return { text: result.response.text(), sources: [] };
+
+            const result = await genAI!.models.generateContent({
+                model: modelName,
+                contents: fullPrompt
+            });
+            return { text: result.text || "...", sources: [] };
         });
 
     } catch (error: any) {
@@ -245,9 +242,11 @@ export const getDailyWellnessTip = async (): Promise<string> => {
     if (!genAI) return "¡Mantente activo y bebe agua!";
     try {
         return await simpleGenerate(async (modelName) => {
-            const model = genAI!.getGenerativeModel({ model: modelName });
-            const result = await model.generateContent("Genera un consejo de fitness corto y motivador para hoy en español.");
-            return result.response.text();
+            const result = await genAI!.models.generateContent({
+                model: modelName,
+                contents: "Genera un consejo de fitness corto y motivador para hoy en español."
+            });
+            return result.text || "¡A moverse!";
         });
     } catch (e) {
         return "El descanso es clave para el progreso.";
@@ -281,7 +280,6 @@ export const getGymAdminAdvice = async (prompt: string): Promise<{ text: string;
 
     try {
         return await simpleGenerate(async (modelName) => {
-            const model = genAI!.getGenerativeModel({ model: modelName });
             const systemInstruction = `
             Eres un Consultor Experto en Gestión de Gimnasios y Negocios Fitness.
             Tu objetivo es ayudar al administrador del gimnasio "El Templo" a optimizar su negocio.
@@ -300,10 +298,13 @@ export const getGymAdminAdvice = async (prompt: string): Promise<{ text: string;
             4. Usa formato Markdown (negritas, listas) para facilitar la lectura.
             `;
 
-
             const fullPrompt = `${systemInstruction}\n\nPregunta del Administrador: ${prompt}`;
-            const result = await model.generateContent(fullPrompt);
-            return { text: result.response.text(), sources: [] };
+
+            const result = await genAI!.models.generateContent({
+                model: modelName,
+                contents: fullPrompt
+            });
+            return { text: result.text || "...", sources: [] };
         });
 
     } catch (error: any) {
@@ -317,7 +318,6 @@ export const generateServiceImageMetadata = async (name: string, description: st
 
     try {
         return await simpleGenerate(async (modelName) => {
-            const model = genAI!.getGenerativeModel({ model: modelName });
             const prompt = `
             Act as a Search Engine Optimization expert for stock images.
             Service Name: "${name}"
@@ -332,8 +332,11 @@ export const generateServiceImageMetadata = async (name: string, description: st
             Return ONLY the keyword. No json, no quotes.
             `;
 
-            const result = await model.generateContent(prompt);
-            const keyword = result.response.text().trim().replace(/"/g, '');
+            const result = await genAI!.models.generateContent({
+                model: modelName,
+                contents: prompt
+            });
+            const keyword = (result.text || "fitness").trim().replace(/"/g, '');
             return { keyword };
         });
     } catch (error) {

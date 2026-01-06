@@ -54,6 +54,12 @@ export default defineConfig(({ mode }) => {
       })
     ],
     base: '/Fitness-ProIA/',
+    build: {
+      outDir: 'build_output'
+    },
+    server: {
+      port: 3000
+    },
     define: {
       'process.env.API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY || '')
     }

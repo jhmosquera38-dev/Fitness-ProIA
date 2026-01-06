@@ -168,8 +168,8 @@ ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 CREATE TABLE IF NOT EXISTS public.bookings (
     id SERIAL PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-    service_id INTEGER REFERENCES public.coach_services(id),
-    class_id INTEGER REFERENCES public.gym_classes(id),
+    service_id INTEGER REFERENCES public.coach_services(id) ON DELETE CASCADE,
+    class_id INTEGER REFERENCES public.gym_classes(id) ON DELETE CASCADE,
     status TEXT DEFAULT 'confirmed', -- 'confirmed', 'cancelled', 'completed'
     booking_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     scheduled_for TIMESTAMP WITH TIME ZONE,

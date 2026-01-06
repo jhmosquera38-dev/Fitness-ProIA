@@ -19,7 +19,9 @@ export const authService = {
      */
     loginWithGoogle: async (accountType?: string) => {
         // Construir URL de redirección base
-        let redirectTo = `${window.location.origin}/`;
+        // IMPORTANTE: Vite inyecta import.meta.env.BASE_URL con el valor de 'base' en vite.config.ts
+        const baseUrl = import.meta.env.BASE_URL; // '/Fitness-ProIA/'
+        let redirectTo = `${window.location.origin}${baseUrl}`;
 
         // Append intent to URL if provided to persist across redirect
         if (accountType) {
