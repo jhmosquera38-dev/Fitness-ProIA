@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/Fitness-ProIA/sw.js', { scope: '/Fitness-ProIA/' })})}
