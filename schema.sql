@@ -428,8 +428,31 @@ CREATE POLICY "Public view music" ON public.music_tracks FOR SELECT USING (true)
 -- SEED DATA MÚSICA
 INSERT INTO public.music_tracks (title, artist, platform, url, category, bpm)
 VALUES 
+-- Cardio / HIIT
+('Best Workout Music 2025', 'Max Oazo Mix', 'YouTube', 'https://www.youtube.com/watch?v=I6PPdlxvO90', 'cardio_hiit', 130),
+('Gym Workout Best Songs', 'EDM Mix 2025', 'YouTube', 'https://www.youtube.com/watch?v=rpLRfvXzbMw', 'cardio_hiit', 128),
+('35 Top Hits Workout Remix', 'Workout Music Source', 'YouTube', 'https://www.youtube.com/watch?v=5bC-1-3L4X4', 'cardio_hiit', 140),
+('1 Hour of Pop Workout Songs', 'Pop Hits Mix', 'YouTube', 'https://www.youtube.com/watch?v=rC5S9eF-d9o', 'cardio_hiit', 135),
 ('Blinding Lights', 'The Weeknd', 'YouTube', 'https://www.youtube.com/watch?v=4NRXx6U8ABQ', 'cardio_hiit', 171),
+('Motivation Mix 2025', 'Fitness Station', 'YouTube', 'https://www.youtube.com/watch?v=613eVDWmL6w', 'cardio_hiit', 128),
+
+-- Fuerza
+('Strength Training Hits', 'Workout Music Source', 'YouTube', 'https://www.youtube.com/watch?v=lK5z-K42f0A', 'fuerza', 124),
+('Gym Motivation Top Songs', 'Fearless Motivation', 'YouTube', 'https://www.youtube.com/watch?v=5W7oQ_oW_4Q', 'fuerza', 110),
+('Fitness & Gym Motivation', 'Mix 2025', 'YouTube', 'https://www.youtube.com/watch?v=j2n_1K9rVbY', 'fuerza', 120),
+('Hard Hitting Gym Music', 'Barbell Nation', 'YouTube', 'https://www.youtube.com/watch?v=gX-hUoJ3c5w', 'fuerza', 130),
 ('Eye of the Tiger', 'Survivor', 'YouTube', 'https://www.youtube.com/watch?v=btPJPFnesV4', 'fuerza', 109),
+
+-- Run / Ride
+('40 Best Running Songs 2024', 'Power Music', 'YouTube', 'https://www.youtube.com/watch?v=fRj6P2uG9gI', 'running_cycling', 170),
+('Running High Tempo Mix', 'Workout Music Source', 'YouTube', 'https://www.youtube.com/watch?v=g7Q2R8nJt-U', 'running_cycling', 160),
 ('Can''t Stop', 'Red Hot Chili Peppers', 'YouTube', 'https://www.youtube.com/watch?v=BfOdWSiyWoc', 'running_cycling', 134),
-('Weightless', 'Marconi Union', 'YouTube', 'https://www.youtube.com/watch?v=UfcAVejslrU', 'yoga_recovery', 60);
+('Marathon Training Mix', 'Runner''s World', 'YouTube', 'https://www.youtube.com/watch?v=rC5S9eF-d9o', 'running_cycling', 150),
+
+-- Yoga / Recovery
+('Ultimate Chill: Modern Yoga', 'Relaxing Music', 'YouTube', 'https://www.youtube.com/watch?v=_e_4jU_e8_4', 'yoga_recovery', 60),
+('1 HOUR Best Yoga Music', 'YellowBrickCinema', 'YouTube', 'https://www.youtube.com/watch?v=q7bIe5h1-Rk', 'yoga_recovery', 50),
+('Peaceful Yoga Music', 'Buddha''s Lounge', 'YouTube', 'https://www.youtube.com/watch?v=kGjW9l5Xh9o', 'yoga_recovery', 45),
+('Weightless', 'Marconi Union', 'YouTube', 'https://www.youtube.com/watch?v=UfcAVejslrU', 'yoga_recovery', 60),
+('Deep Relaxation Mix', 'Soundings of the Planet', 'YouTube', 'https://www.youtube.com/watch?v=e_b4N3t97iI', 'yoga_recovery', 55);
 
