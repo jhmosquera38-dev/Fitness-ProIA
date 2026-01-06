@@ -428,40 +428,22 @@ CREATE POLICY "Public view music" ON public.music_tracks FOR SELECT USING (true)
 -- SEED DATA MÚSICA
 INSERT INTO public.music_tracks (title, artist, platform, url, category, bpm)
 VALUES 
--- Cardio / HIIT
-('Houdini', 'Dua Lipa', 'YouTube', 'https://www.youtube.com/watch?v=L0c5RqhlJg4', 'cardio_hiit', 117),
-('Espresso', 'Sabrina Carpenter', 'YouTube', 'https://www.youtube.com/watch?v=3n1Jb_t9BBU', 'cardio_hiit', 110),
-('Greedy', 'Tate McRae', 'YouTube', 'https://www.youtube.com/watch?v=C2_xH647s4g', 'cardio_hiit', 111),
-('Lil Boo Thang', 'Paul Russell', 'YouTube', 'https://www.youtube.com/watch?v=j_H3G03s9Y8', 'cardio_hiit', 114),
-('Padam Padam', 'Kylie Minogue', 'YouTube', 'https://www.youtube.com/watch?v=q_0E733w_tU', 'cardio_hiit', 128),
-('Miracle', 'Calvin Harris', 'YouTube', 'https://www.youtube.com/watch?v=eG1s18-h-pU', 'cardio_hiit', 143),
-('Rush', 'Troye Sivan', 'YouTube', 'https://www.youtube.com/watch?v=G2_h94NnQ0Q', 'cardio_hiit', 126),
-('Dance The Night', 'Dua Lipa', 'YouTube', 'https://www.youtube.com/watch?v=Cp-CKX_CNIE', 'cardio_hiit', 110),
-('Texas Hold ''Em', 'Beyoncé', 'YouTube', 'https://www.youtube.com/watch?v=yYn-h3_g-6c', 'cardio_hiit', 110),
-('Water', 'Tyla', 'YouTube', 'https://www.youtube.com/watch?v=o8jG8fK2k64', 'cardio_hiit', 117),
-('I''m Good (Blue)', 'David Guetta', 'YouTube', 'https://www.youtube.com/watch?v=J7jW07kC_9M', 'cardio_hiit', 128),
-('Best Workout Music 2025', 'Max Oazo Mix', 'YouTube', 'https://www.youtube.com/watch?v=I6PPdlxvO90', 'cardio_hiit', 130),
+-- 🔥 CARDIO / HIIT
+('Houdini', 'Dua Lipa', 'YouTube', 'https://www.youtube.com/embed/F4neLKchgJA', 'cardio_hiit', 117),
+('Espresso', 'Sabrina Carpenter', 'YouTube', 'https://www.youtube.com/embed/HSUo81J2t8Q', 'cardio_hiit', 110),
+('Greedy', 'Tate McRae', 'YouTube', 'https://www.youtube.com/embed/gT5-eT7qfL0', 'cardio_hiit', 111),
+('Water', 'Tyla', 'YouTube', 'https://www.youtube.com/embed/Kq5KjHVrYkE', 'cardio_hiit', 117),
+('Lil Boo Thang', 'Paul Russell', 'YouTube', 'https://www.youtube.com/embed/j_H3G03s9Y8', 'cardio_hiit', 114),
+('Padam Padam', 'Kylie Minogue', 'YouTube', 'https://www.youtube.com/embed/p6CnBZMK9Rs', 'cardio_hiit', 128),
+('Miracle', 'Calvin Harris & Ellie Goulding', 'YouTube', 'https://www.youtube.com/embed/kG1S-qL7a1g', 'cardio_hiit', 143),
+('Rush', 'Troye Sivan', 'YouTube', 'https://www.youtube.com/embed/b5V7nK5GgQc', 'cardio_hiit', 126),
+('Dance The Night', 'Dua Lipa', 'YouTube', 'https://www.youtube.com/embed/b0V-F4DlSpg', 'cardio_hiit', 110),
 
--- Fuerza (Hip Hop & Rock)
-('Till I Collapse', 'Eminem', 'YouTube', 'https://www.youtube.com/watch?v=ytQ5CYE1VZw', 'fuerza', 171),
-('Dreams and Nightmares', 'Meek Mill', 'YouTube', 'https://www.youtube.com/watch?v=ZlP7Y_bS1_Q', 'fuerza', 83),
-('Humble.', 'Kendrick Lamar', 'YouTube', 'https://www.youtube.com/watch?v=tvTRZJ-4EyI', 'fuerza', 150),
-('First Person Shooter', 'Drake ft. J. Cole', 'YouTube', 'https://www.youtube.com/watch?v=pYg1aV0n4sY', 'fuerza', 82),
-('Win', 'Jay Rock', 'YouTube', 'https://www.youtube.com/watch?v=jrLhF3tM3rY', 'fuerza', 149),
-('Rich Flex', 'Drake & 21 Savage', 'YouTube', 'https://www.youtube.com/watch?v=I4DjHHVHWAE', 'fuerza', 154),
-('Going Bad', 'Meek Mill', 'YouTube', 'https://www.youtube.com/watch?v=3u_F6ZfS7e8', 'fuerza', 86),
-('POWER', 'Kanye West', 'YouTube', 'https://www.youtube.com/watch?v=L53gjP-TtGE', 'fuerza', 154),
-('Black Skinhead', 'Kanye West', 'YouTube', 'https://www.youtube.com/watch?v=q604eed4ad0', 'fuerza', 130),
-('Eye of the Tiger', 'Survivor', 'YouTube', 'https://www.youtube.com/watch?v=btPJPFnesV4', 'fuerza', 109),
-('Rock Workout Mix', 'Gym Motivation', 'YouTube', 'https://www.youtube.com/watch?v=1M4j-n0P9oQ', 'fuerza', 130),
-
--- Run / Ride (Hardstyle & High Tempo)
-('Hardstyle Pump Mix', 'Gym Rat Music', 'YouTube', 'https://www.youtube.com/watch?v=rpLRfvXzbMw', 'running_cycling', 160),
-('40 Best Running Songs 2024', 'Power Music', 'YouTube', 'https://www.youtube.com/watch?v=fRj6P2uG9gI', 'running_cycling', 170),
-('Can''t Stop', 'Red Hot Chili Peppers', 'YouTube', 'https://www.youtube.com/watch?v=BfOdWSiyWoc', 'running_cycling', 134),
-
--- Yoga / Recovery
-('Ultimate Chill: Modern Yoga', 'Relaxing Music', 'YouTube', 'https://www.youtube.com/watch?v=_e_4jU_e8_4', 'yoga_recovery', 60),
-('1 HOUR Best Yoga Music', 'YellowBrickCinema', 'YouTube', 'https://www.youtube.com/watch?v=q7bIe5h1-Rk', 'yoga_recovery', 50),
-('Weightless', 'Marconi Union', 'YouTube', 'https://www.youtube.com/watch?v=UfcAVejslrU', 'yoga_recovery', 60);
+-- 🦍 FUERZA
+('Till I Collapse', 'Eminem', 'YouTube', 'https://www.youtube.com/embed/ObfE-l07M6k', 'fuerza', 171),
+('Dreams and Nightmares', 'Meek Mill', 'YouTube', 'https://www.youtube.com/embed/S8gfqs1-NuE', 'fuerza', 83),
+('HUMBLE.', 'Kendrick Lamar', 'YouTube', 'https://www.youtube.com/embed/tvTRZJ-4EyI', 'fuerza', 150),
+('POWER', 'Kanye West', 'YouTube', 'https://www.youtube.com/embed/L53gjP-TtGE', 'fuerza', 154),
+('X Gon'' Give It To Ya', 'DMX', 'YouTube', 'https://www.youtube.com/embed/fGx6K90TmCI', 'fuerza', 130),
+('Paint The Town Red', 'Doja Cat', 'YouTube', 'https://www.youtube.com/embed/m4_9TFeMfJE', 'fuerza', 120);
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { musicService, MusicCatalog, MusicTrack } from '../services/musicService';
 
 interface MusicWidgetProps {
@@ -63,24 +64,25 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
         ? `https://www.youtube.com/embed/${youtubeId}?autoplay=${isPlaying ? 1 : 0}&enablejsapi=1&controls=0&loop=1`
         : '';
 
-    return (
+    // Portal to body
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
+
+    return createPortal(
         <>
             {/* Backdrop for mobile */}
             {isOpen && (
-                <div className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px] md:hidden" onClick={onClose} />
+                <div className="fixed inset-0 z-[9998] bg-black/10 backdrop-blur-[1px] md:hidden" onClick={onClose} />
             )}
 
-
-
-            {/* Desktop Container (Pop-over) & Mobile Logic Unification */}
-            {/* Actually, let's keep one div but switch classes entirely */}
+            {/* Container - Fixed on both Mobile and Desktop (via Portal) */}
             <div className={`
-                z-[100] transition-all duration-300 ease-in-out
-                ${/* Mobile Styles */ ''}
-                fixed inset-x-0 bottom-0 top-16 md:top-auto md:bottom-auto md:inset-x-auto
-                ${/* Desktop Styles */ ''}
-                md:absolute md:top-16 md:right-10 md:w-96
-                ${/* Visibility/Transform State */ ''}
+                z-[9999] transition-all duration-300 ease-in-out
+                fixed inset-x-0 bottom-0 top-16 md:top-20 md:right-10 md:bottom-auto md:left-auto md:w-96
                 ${isOpen
                     ? 'translate-y-0 opacity-100 pointer-events-auto'
                     : 'translate-y-4 md:translate-y-0 md:opacity-0 pointer-events-none'
@@ -188,11 +190,10 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                     </div>
 
                     <div className="p-2 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 text-center">
-                        <p className="text-[10px] text-slate-400">Powered by YouTube Embeds</p>
                     </div>
-
                 </div>
             </div>
-        </>
+        </>,
+        document.body
     );
 };
