@@ -76,10 +76,8 @@ const generatePrompt = (profile: UserProfile, dailyStatus?: DailyCheckin): strin
 // MODEL FALLBACK SYSTEM (Multi-version support)
 // ----------------------------------------------------------------------------
 const MODEL_CANDIDATES = [
-    "gemini-2.0-flash-exp",   // Newest
-    "gemini-2.0-flash",       // Stable
-    "gemini-1.5-flash",       // Classic
-    "gemini-1.5-flash-latest" // Last resort
+    "gemini-2.0-flash-exp",   // Newest (Free Tier Quota applies)
+    "gemini-1.5-flash",       // Classic Stable
 ];
 
 async function safeModelExecute(

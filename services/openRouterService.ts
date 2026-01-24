@@ -16,7 +16,7 @@ export const openRouterService = {
                 "X-Title": "FitnessFlow SaaS",
             },
             body: JSON.stringify({
-                model: "google/gemini-2.0-flash-exp:free", // Reliable free fallback
+                model: "google/gemini-pro-1.5", // More stable paid/free tier fallback
                 messages: [
                     ...(systemInstruction ? [{ role: "system", content: systemInstruction }] : []),
                     { role: "user", content: prompt }
