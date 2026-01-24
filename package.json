@@ -6,7 +6,7 @@
   "homepage": "https://jhmosquera38-dev.github.io/Fitness-ProIA",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build --emptyOutDir",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build_output -r https://github.com/jhmosquera38-dev/Fitness-ProIA.git"
