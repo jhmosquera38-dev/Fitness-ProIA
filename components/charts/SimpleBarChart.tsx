@@ -24,8 +24,8 @@ export const SimpleBarChart: React.FC<ChartProps> = ({ data }) => {
     const height = 250;
     const margin = { top: 20, right: 20, bottom: 30, left: 40 };
 
-    const calculatedMax = Math.max(...data.map(d => d.income), ...data.map(d => d.expenses));
-    const maxValue = calculatedMax === 0 ? 100 : calculatedMax;
+    const calculatedMax = data.length > 0 ? Math.max(...data.map(d => d.income), ...data.map(d => d.expenses)) : 0;
+    const maxValue = !isFinite(calculatedMax) || calculatedMax === 0 ? 100 : calculatedMax;
 
     // Escalas lineales simples
     const xScale = (index: number) => margin.left + (index * (width - margin.left - margin.right)) / data.length;

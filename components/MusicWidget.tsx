@@ -35,6 +35,7 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
     const [activeCategory, setActiveCategory] = useState<keyof MusicCatalog>('cardio_hiit');
     const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(false);
 
     // Fetch Catalog on mount
     useEffect(() => {
@@ -74,21 +75,25 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
 
     return createPortal(
         <>
-            {/* Backdrop for mobile */}
-            {isOpen && (
+            {/* Backdrop for mobile - ONLY when open AND NOT minimized */}
+            {isOpen && !isMinimized && (
                 <div className="fixed inset-0 z-[9998] bg-black/10 backdrop-blur-[1px] md:hidden" onClick={onClose} />
             )}
 
             {/* Container - Fixed on both Mobile and Desktop (via Portal) */}
             <div id="music-widget-portal" className={`
                 z-[9999] transition-all duration-300 ease-in-out
-                fixed inset-x-0 bottom-0 top-16 md:top-20 md:right-10 md:bottom-auto md:left-auto md:w-96
+                fixed right-4 md:right-10 bottom-24 md:bottom-auto md:top-20 md:w-96
                 ${isOpen
                     ? 'translate-y-0 opacity-100 pointer-events-auto'
-                    : 'translate-y-4 md:translate-y-0 md:opacity-0 pointer-events-none'
+                    : 'translate-y-10 opacity-0 pointer-events-none'
                 }
+                ${isMinimized ? 'w-[200px] md:w-[240px]' : 'w-[calc(100%-2rem)] md:w-96'}
             `}>
-                <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-t md:border border-slate-200 dark:border-slate-700 md:rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full md:h-auto md:max-h-[80vh]">
+                <div className={`
+                    bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300
+                    ${isMinimized ? 'h-16' : 'h-[60vh] md:h-auto md:max-h-[80vh]'}
+                `}>
 
                     {/* Header */}
                     <div className="p-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex justify-between items-center flex-shrink-0">
@@ -97,100 +102,111 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                                 <span className="text-lg">🎵</span>
                             </div>
                             <div className="flex flex-col">
-                                <span className="font-bold text-sm tracking-wide">FitnessFlow Music</span>
+                                <span className="font-bold text-[11px] md:text-xs tracking-wide">FitnessFlow Music</span>
                                 {currentTrack ? (
-                                    <span className="text-[10px] text-brand-primary truncate max-w-[150px] block">
+                                    <span className="text-[9px] text-brand-primary truncate max-w-[100px] md:max-w-[150px] block">
                                         {isPlaying ? 'Reproduciendo:' : 'Pausado:'} {currentTrack.title}
                                     </span>
                                 ) : (
-                                    <span className="text-[10px] text-slate-400">Selecciona tu ritmo</span>
+                                    <span className="text-[9px] text-slate-400">Selecciona tu ritmo</span>
                                 )}
                             </div>
                         </div>
-                        <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
-                            ✖
-                        </button>
-                    </div>
-
-                    {/* YouTube Player Container (Visible when playing to comply with TOS, but small/integrated) */}
-                    {youtubeId && (
-                        <div className="w-full aspect-video bg-black flex-shrink-0 relative group">
-                            {/* Overlay to prevent stealing clicks if needed, or allow interaction */}
-                            {!isPlaying && <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 pointer-events-none"><span className="text-white text-xs">Pausado</span></div>}
-
-                            <iframe
-                                width="100%"
-                                height="100%"
-                                src={embedUrl}
-                                title="YouTube video player"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                className="w-full h-full"
-                            ></iframe>
-                        </div>
-                    )}
-
-                    {/* Category Tabs */}
-                    <div className="flex overflow-x-auto p-2 gap-2 border-b border-slate-200 dark:border-slate-700 scrollbar-hide flex-shrink-0">
-                        {CATEGORIES.map(cat => (
+                        <div className="flex items-center gap-2">
                             <button
-                                key={cat.key}
-                                onClick={() => setActiveCategory(cat.key)}
-                                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${activeCategory === cat.key
-                                    ? 'bg-brand-primary text-slate-900'
-                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
-                                    }`}
+                                onClick={() => setIsMinimized(!isMinimized)}
+                                className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors text-lg"
+                                title={isMinimized ? "Maximizar" : "Minimizar"}
                             >
-                                <span>{cat.icon}</span>
-                                {cat.label}
+                                {isMinimized ? '🔼' : '🔽'}
                             </button>
-                        ))}
+                            <button onClick={onClose} className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+                                ✖
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Track List */}
-                    <div className="p-2 space-y-1 overflow-y-auto flex-1 min-h-[200px]">
-                        {currentTracks.length === 0 ? (
-                            <div className="p-8 text-center text-slate-400 text-sm">
-                                No hay pistas en esta categoría.
-                            </div>
-                        ) : (
-                            currentTracks.map((track) => {
-                                const isActive = currentTrack?.id === track.id;
-                                const categoryConfig = CATEGORIES.find(c => c.key === activeCategory);
+                    {/* Content below header - Only visible when NOT minimized */}
+                    {!isMinimized && (
+                        <>
+                            {/* YouTube Player Container (Visible when playing to comply with TOS, but small/integrated) */}
+                            {youtubeId && (
+                                <div className="w-full aspect-video bg-black flex-shrink-0 relative group">
+                                    {/* Overlay to prevent stealing clicks if needed, or allow interaction */}
+                                    {!isPlaying && <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 pointer-events-none"><span className="text-white text-xs">Pausado</span></div>}
 
-                                return (
+                                    <iframe
+                                        width="100%"
+                                        height="100%"
+                                        src={embedUrl}
+                                        title="YouTube video player"
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                        className="w-full h-full"
+                                    ></iframe>
+                                </div>
+                            )}
+
+                            {/* Category Tabs */}
+                            <div className="flex overflow-x-auto p-2 gap-2 border-b border-slate-200 dark:border-slate-700 scrollbar-hide flex-shrink-0">
+                                {CATEGORIES.map(cat => (
                                     <button
-                                        key={track.id}
-                                        onClick={() => handleTrackClick(track)}
-                                        className={`w-full flex items-center gap-3 p-2 rounded-xl transition-all duration-200 group cursor-pointer text-left border ${isActive ? 'bg-slate-100 dark:bg-slate-700/60 border-brand-primary/30' : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/30'}`}
+                                        key={cat.key}
+                                        onClick={() => setActiveCategory(cat.key)}
+                                        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${activeCategory === cat.key
+                                            ? 'bg-brand-primary text-slate-900'
+                                            : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                                            }`}
                                     >
-                                        <div className={`relative w-10 h-10 rounded-lg bg-gradient-to-br ${categoryConfig?.color || 'from-gray-500 to-gray-600'} flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform flex-shrink-0`}>
-                                            {/* Generic Cover or Icon */}
-                                            <span className="text-xs">▶</span>
-                                            {isActive && isPlaying && (
-                                                <div className="absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center">
-                                                    <EqualizerBar />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex-grow min-w-0">
-                                            <p className={`font-bold text-sm truncate ${isActive ? 'text-brand-primary' : 'text-slate-800 dark:text-slate-200'}`}>{track.title}</p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{track.artist}</p>
-                                        </div>
-                                        <div className="flex flex-col items-end gap-1">
-                                            <span className="text-[10px] font-bold bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300 px-1.5 py-0.5 rounded-full">
-                                                {track.bpm} BPM
-                                            </span>
-                                        </div>
+                                        <span>{cat.icon}</span>
+                                        {cat.label}
                                     </button>
-                                );
-                            })
-                        )}
-                    </div>
+                                ))}
+                            </div>
 
-                    <div className="p-2 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 text-center">
-                    </div>
+                            {/* Track List */}
+                            <div className="p-2 space-y-1 overflow-y-auto flex-1 min-h-[200px]">
+                                {currentTracks.length === 0 ? (
+                                    <div className="p-8 text-center text-slate-400 text-sm">
+                                        No hay pistas en esta categoría.
+                                    </div>
+                                ) : (
+                                    currentTracks.map((track) => {
+                                        const isActive = currentTrack?.id === track.id;
+                                        const categoryConfig = CATEGORIES.find(c => c.key === activeCategory);
+
+                                        return (
+                                            <button
+                                                key={track.id}
+                                                onClick={() => handleTrackClick(track)}
+                                                className={`w-full flex items-center gap-3 p-2 rounded-xl transition-all duration-200 group cursor-pointer text-left border ${isActive ? 'bg-slate-100 dark:bg-slate-700/60 border-brand-primary/30' : 'border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/30'}`}
+                                            >
+                                                <div className={`relative w-10 h-10 rounded-lg bg-gradient-to-br ${categoryConfig?.color || 'from-gray-500 to-gray-600'} flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform flex-shrink-0`}>
+                                                    {/* Generic Cover or Icon */}
+                                                    <span className="text-xs">▶</span>
+                                                    {isActive && isPlaying && (
+                                                        <div className="absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center">
+                                                            <EqualizerBar />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-grow min-w-0">
+                                                    <p className={`font-bold text-sm truncate ${isActive ? 'text-brand-primary' : 'text-slate-800 dark:text-slate-200'}`}>{track.title}</p>
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{track.artist}</p>
+                                                </div>
+                                                <div className="flex flex-col items-end gap-1">
+                                                    <span className="text-[10px] font-bold bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300 px-1.5 py-0.5 rounded-full">
+                                                        {track.bpm} BPM
+                                                    </span>
+                                                </div>
+                                            </button>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </>,

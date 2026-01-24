@@ -19,7 +19,7 @@ export const WeeklyVolumeChart: React.FC<ChartProps> = ({ data }) => {
     const height = 250;
     const margin = { top: 20, right: 20, bottom: 30, left: 40 };
 
-    const maxVolume = Math.max(...data.map(d => d.volume), 0);
+    const maxVolume = data.length > 0 ? Math.max(...data.map(d => d.volume), 0) : 0;
     const minVolume = 0;
 
     // Escalas

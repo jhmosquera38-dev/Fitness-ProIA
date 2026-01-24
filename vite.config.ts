@@ -50,6 +50,26 @@ export default defineConfig(({ mode }) => {
               purpose: 'any maskable'
             }
           ]
+        },
+        workbox: {
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/openrouter\.ai\/api\/v1\/.*/i,
+              handler: 'NetworkOnly',
+              options: {
+                backgroundSync: {
+                  name: 'openrouter-queue',
+                  options: {
+                    maxRetentionTime: 24 * 60
+                  }
+                }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/generativelanguage\.googleapis\.com\/.*/i,
+              handler: 'NetworkOnly'
+            }
+          ]
         }
       })
     ],

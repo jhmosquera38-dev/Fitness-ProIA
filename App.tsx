@@ -16,7 +16,7 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { MainApp } from './MainApp';
-import { SubscriptionPage } from './pages/SubscriptionPage';
+// Eliminado: import { SubscriptionGate } from './pages/SubscriptionGate';
 import { GoogleLoginModal } from './components/GoogleLoginModal';
 import { OnboardingWizard } from './components/OnboardingWizard';
 import { InstallPWA } from './components/InstallPWA';
@@ -57,7 +57,7 @@ const App: React.FC = () => {
   const [users, setUsers] = useState<User[]>(USERS_DATA); // "Base de datos" local de usuarios
   const [currentUser, setCurrentUser] = useState<User | null>(null); // Usuario logueado actualmente
   const [currentView, setCurrentView] = useState<AppView>('landing'); // Qué pantalla se muestra
-  const [registrationState, setRegistrationState] = useState<RegistrationState>({ accountType: 'user', plan: 'básico' });
+  const [registrationState, setRegistrationState] = useState<RegistrationState>({ accountType: 'user', plan: 'premium' });
   const [isGoogleLoginModalOpen, setIsGoogleLoginModalOpen] = useState(false);
 
 
@@ -138,10 +138,10 @@ const App: React.FC = () => {
           name: profile.full_name || supabaseUser.email?.split('@')[0] || 'Usuario',
           email: profile.email || supabaseUser.email,
           accountType: finalRole,
-          plan: profile.plan || 'básico',
-          subscriptionStatus: profile.subscription_status || 'trial',
+          plan: 'premium', // Forzado para la demo
+          subscriptionStatus: 'subscribed', // Forzado para evitar expiración
           isGymMember: profile.is_gym_member || false,
-          trialEndDate: profile.trial_end_date ? new Date(profile.trial_end_date) : null,
+          trialEndDate: null, // Sin fecha de fin
           notifications: [],
           hasCompletedOnboarding: profile.has_completed_onboarding || localOnboardingStatus || false,
 
@@ -201,10 +201,10 @@ const App: React.FC = () => {
           name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'Usuario',
           email: supabaseUser.email || '',
           accountType: storedAccountType as any,
-          plan: 'básico',
-          subscriptionStatus: 'trial',
+          plan: 'premium',
+          subscriptionStatus: 'trial', // Reset to Trial
           isGymMember: false,
-          trialEndDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+          trialEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 Days from NOW
           notifications: [],
           hasCompletedOnboarding: false, // Asumir false si no pudimos leer
         };
@@ -227,14 +227,35 @@ const App: React.FC = () => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
 
     // Verificar si la prueba gratuita ha expirado
-    if (currentUser && currentUser.subscriptionStatus === 'trial' && currentUser.trialEndDate) {
-      if (new Date() > new Date(currentUser.trialEndDate)) {
-        // Si la fecha actual supera la fecha fin, marcar como expirado
-        handleUpdateUser(currentUser.email, { ...currentUser, subscriptionStatus: 'expired' });
+    // Verificar si la prueba gratuita ha expirado y aplicar Auto-Fix para Demo
+    if (currentUser) {
+      let needsUpdate = false;
+      let updatedUser = { ...currentUser };
+      const now = new Date();
 
-        // Redirigir a la página de suscripción si no está allí
-        if (currentView !== 'subscription') {
-          setCurrentView('subscription');
+      // 1. Upgrade Trial to Premium if needed
+      if (updatedUser.subscriptionStatus === 'trial' && updatedUser.plan !== 'premium') {
+        updatedUser.plan = 'premium';
+        needsUpdate = true;
+      }
+
+      // 2. Extend/Reset Trial if Expired or close to expiring (Auto-fix for existing users)
+      if (updatedUser.subscriptionStatus === 'expired' ||
+        (updatedUser.subscriptionStatus === 'trial' && updatedUser.trialEndDate && now > new Date(updatedUser.trialEndDate))) {
+        const newEndDate = new Date();
+        newEndDate.setDate(newEndDate.getDate() + 30);
+
+        updatedUser.subscriptionStatus = 'trial';
+        updatedUser.trialEndDate = newEndDate;
+        updatedUser.plan = 'premium'; // Ensure premium
+        needsUpdate = true;
+      }
+
+      if (needsUpdate) {
+        handleUpdateUser(currentUser.email, updatedUser);
+        // Ensure view is accessible
+        if (currentView === 'subscription') {
+          setCurrentView('main');
         }
       }
     }
@@ -258,35 +279,34 @@ const App: React.FC = () => {
   const handleLoginSuccess = ({ email }: { email: string }) => {
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (user) {
-      // Verificar expiración inmediatamente al loguearse
-      let status = user.subscriptionStatus;
-      if (status === 'trial' && user.trialEndDate && new Date() > new Date(user.trialEndDate)) {
-        status = 'expired';
-        const expiredUser = { ...user, subscriptionStatus: 'expired' as const };
-        handleUpdateUser(user.email, expiredUser);
-        setCurrentUser(expiredUser);
-        setCurrentView('subscription');
-        return;
+      // --- NUCLEAR OPTION FOR LOGIN DEMO --- 
+      // Forzamos "cleanUser" con status 'subscribed' y 'premium' siempre que entre.
+      // Esto sobrescribe cualquier estado expirado o 'básico' que pudiera tener.
+      // --- TRIAl RESURRECTION (Configuración Solicitada) --- 
+      // Si el usuario entra, le damos 30 días de prueba fresca.
+      const cleanUser = {
+        ...user,
+        subscriptionStatus: 'trial' as const,
+        plan: 'premium' as const,
+        trialEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 días desde HOY
+      };
+
+      setCurrentUser(cleanUser);
+
+      const hasLocalPersistence = localStorage.getItem(`onboarding_completed_${user.email}`) === 'true';
+
+      // Sincronizar persistencia local
+      if (hasLocalPersistence && !user.hasCompletedOnboarding) {
+        cleanUser.hasCompletedOnboarding = true;
+        // Actualizamos la base de datos (array 'users') con el user saneado
+        setUsers(prev => prev.map(u => u.email === user.email ? cleanUser : u));
       }
 
-      if (status === 'expired') {
-        setCurrentUser(user);
-        setCurrentView('subscription');
+      // Redirigir siempre a flujo correcto, nunca a 'subscription'
+      if (cleanUser.hasCompletedOnboarding) {
+        setCurrentView('main');
       } else {
-        const hasLocalPersistence = localStorage.getItem(`onboarding_completed_${user.email}`) === 'true';
-
-        // Unificar estado en memoria con persistencia local
-        if (hasLocalPersistence && !user.hasCompletedOnboarding) {
-          user.hasCompletedOnboarding = true;
-        }
-
-        setCurrentUser(user);
-        // Si es la primera vez (onboarding incompleto), ir al asistente, si no al Main
-        if (user.hasCompletedOnboarding) {
-          setCurrentView('main');
-        } else {
-          setCurrentView('onboarding');
-        }
+        setCurrentView('onboarding');
       }
     } else {
       alert("Usuario no encontrado.");
@@ -304,7 +324,7 @@ const App: React.FC = () => {
   // Maneja el éxito del registro: Crea el nuevo usuario en el estado
   const handleRegisterSuccess = (data: Partial<User> & { email: string, accountType: 'user' | 'gym' | 'entrenador', plan: 'gratis' | 'básico' | 'premium' }) => {
     const trialEndDate = new Date();
-    trialEndDate.setDate(trialEndDate.getDate() + 15); // 15 días exactos de prueba
+    trialEndDate.setDate(trialEndDate.getDate() + 30); // 30 días exactos de prueba
 
     const newUser: User = {
       name: data.name || 'Nuevo Usuario',
@@ -315,7 +335,7 @@ const App: React.FC = () => {
       subscriptionStatus: 'trial', // Comienza en periodo de prueba
       isGymMember: false,
       trialEndDate: trialEndDate,
-      notifications: [{ id: 1, message: '¡Bienvenido a tu prueba Premium de 15 días!', date: new Date().toLocaleDateString(), read: false }],
+      notifications: [{ id: 1, message: '¡Bienvenido a tu prueba Premium de 30 días!', date: new Date().toLocaleDateString(), read: false }],
       hasCompletedOnboarding: false,
       // Datos específicos según tipo de usuario
       ...(data.accountType === 'user' && { profile: undefined }),
@@ -386,7 +406,7 @@ const App: React.FC = () => {
 
   const handleGoToRegister = () => {
     setCurrentUser(null);
-    handleStartRegistration('user', 'básico');
+    handleStartRegistration('user', 'premium');
   };
 
   const handleSubscriptionSuccess = () => {
@@ -473,10 +493,10 @@ const App: React.FC = () => {
 
     // Router básico (Switch)
     switch (currentView) {
-      case 'login': return <LoginPage onNavigateToRegister={() => handleStartRegistration('user', 'básico')} onNavigateBack={handleNavigateToLanding} onLoginSuccess={handleLoginSuccess} onGoogleLogin={handleGoogleLogin} />;
+      case 'login': return <LoginPage onNavigateToRegister={() => handleStartRegistration('user', 'premium')} onNavigateBack={handleNavigateToLanding} onLoginSuccess={handleLoginSuccess} onGoogleLogin={handleGoogleLogin} />;
       case 'register': return <RegisterPage onNavigateToLogin={handleNavigateToLogin} onNavigateBack={handleNavigateToLanding} onRegisterSuccess={handleRegisterSuccess} onGoogleLogin={handleGoogleLogin} initialAccountType={registrationState.accountType} initialPlan={registrationState.plan} />;
-      case 'subscription': return <SubscriptionPage onSubscriptionSuccess={handleSubscriptionSuccess} isGymMember={currentUser?.isGymMember} />;
-      case 'onboarding': return currentUser ? <OnboardingWizard user={currentUser} onComplete={handleOnboardingComplete} /> : <LoginPage onNavigateToRegister={() => handleStartRegistration('user', 'básico')} onNavigateBack={handleNavigateToLanding} onLoginSuccess={handleLoginSuccess} onGoogleLogin={handleGoogleLogin} />;
+      // Eliminado: case 'subscription': return <SubscriptionGate ... />
+      case 'onboarding': return currentUser ? <OnboardingWizard user={currentUser} onComplete={handleOnboardingComplete} /> : <LoginPage onNavigateToRegister={() => handleStartRegistration('user', 'premium')} onNavigateBack={handleNavigateToLanding} onLoginSuccess={handleLoginSuccess} onGoogleLogin={handleGoogleLogin} />;
       case 'landing':
       default:
         return <LandingPage onStartRegistration={handleStartRegistration} onNavigateToLogin={handleNavigateToLogin} onGuestLogin={handleGuestLogin} />;

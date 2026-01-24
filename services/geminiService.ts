@@ -1,7 +1,6 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { type UserProfile, type WorkoutPlan, type DailyCheckin, type AIInsight } from '../types';
-
+import { openRouterService } from './openRouterService';
 // ============================================================================
 // SERVICIO GEMINI (Migrated to @google/genai for Gemini 2.0+ support)
 // Se ha migrado al nuevo SDK oficial para dar soporte a 'gemini-3-flash-preview'.
@@ -21,10 +20,6 @@ try {
     console.warn("Gemini API client could not be initialized:", e);
 }
 
-// Latest Model Configuration (2026)
-// Primary: Gemini 3 Flash Preview (Latest high-speed model)
-// User Requirement: "Usar exclusivamente Gemini 3 Flash Preview"
-const PRIMARY_MODEL = "gemini-3-flash-preview";
 
 const generatePrompt = (profile: UserProfile, dailyStatus?: DailyCheckin): string => {
     const goalMap: any = {
@@ -77,17 +72,59 @@ const generatePrompt = (profile: UserProfile, dailyStatus?: DailyCheckin): strin
     `;
 };
 
-// Helper to execute generation with error handling but NO global blocking
-async function simpleGenerate(
-    operationCallback: (modelName: string) => Promise<any>
+// ----------------------------------------------------------------------------
+// MODEL FALLBACK SYSTEM (Multi-version support)
+// ----------------------------------------------------------------------------
+const MODEL_CANDIDATES = [
+    "gemini-2.0-flash-exp",   // Newest
+    "gemini-2.0-flash",       // Stable
+    "gemini-1.5-flash",       // Classic
+    "gemini-1.5-flash-latest" // Last resort
+];
+
+async function safeModelExecute(
+    callback: (model: string) => Promise<any>,
+    options: { systemInstruction?: string; jsonMode?: boolean; prompt?: string } = {}
 ): Promise<any> {
-    try {
-        return await operationCallback(PRIMARY_MODEL);
-    } catch (error: any) {
-        // Log error but DO NOT block future requests (No Circuit Breaker)
-        console.error(`Gemini (${PRIMARY_MODEL}) Request Failed:`, error);
-        throw error;
+    let lastError: any = null;
+
+    // Phase 1: Try Direct Gemini Models
+    for (const modelName of MODEL_CANDIDATES) {
+        try {
+            return await callback(modelName);
+        } catch (error: any) {
+            lastError = error;
+            // Only continue if it's a 404 (not found), 429 (quota) or 403 (leaked)
+            const isRetryable = error?.message?.includes('404') || error?.status === 404 ||
+                error?.message?.includes('429') || error?.status === 429 ||
+                error?.message?.includes('403') || error?.status === 403;
+
+            if (!isRetryable) throw error;
+            console.warn(`Gemini Direct (${modelName}) failed/rate-limited. Error: ${error.message}`);
+        }
     }
+
+    // Phase 2: Ultimate Fallback - OpenRouter (if API key available)
+    try {
+        const orKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+        if (orKey && options.prompt) {
+            console.log("Switching to OpenRouter Fallback...");
+            const result = await openRouterService.generateContent(
+                options.prompt,
+                options.systemInstruction || "",
+                options.jsonMode || false
+            );
+
+            if (options.jsonMode) {
+                return JSON.parse(result.text.replace(/```json|```/g, '').trim());
+            }
+            return result.text;
+        }
+    } catch (orError: any) {
+        console.error("OpenRouter Fallback failed:", orError);
+    }
+
+    throw lastError; // If everything fails
 }
 
 
@@ -135,32 +172,19 @@ export const generateWorkoutPlan = async (profile: UserProfile, dailyStatus?: Da
         return getFallbackWorkoutPlan(profile.daysPerWeek, profile.goal);
     }
 
+    const aiPrompt = generatePrompt(profile, dailyStatus) + "\n\nIMPORTANT: Return ONLY valid JSON.";
     try {
-        return await simpleGenerate(async (modelName) => {
-            const prompt = generatePrompt(profile, dailyStatus) + "\n\nIMPORTANT: Return ONLY valid JSON.";
-
+        return await safeModelExecute(async (modelName) => {
             const result = await genAI!.models.generateContent({
                 model: modelName,
-                contents: prompt,
+                contents: aiPrompt,
                 config: { responseMimeType: "application/json" }
             });
             const text = result.text || "";
-
-            try {
-                // Clean markdown if present despite instructions
-                const cleanedText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-                const json = JSON.parse(cleanedText);
-
-                if (!json.weeklyPlan || !Array.isArray(json.weeklyPlan) || json.weeklyPlan.length === 0) {
-                    throw new Error("Invalid plan generated: missing weeklyPlan array");
-                }
-
-                return json as WorkoutPlan;
-            } catch (e) {
-                console.error("Failed to parse Gemini response:", text);
-                throw new Error("Error al procesar la respuesta de la IA. Inténtalo de nuevo.");
-            }
-        });
+            // Clean markdown if present despite instructions
+            const cleanedText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+            return JSON.parse(cleanedText);
+        }, { prompt: aiPrompt, jsonMode: true });
     } catch (error) {
         // FALLBACK FINAL: Si todo falla (404, 429, Network), devolvemos el plan mock para no bloquear al usuario
         // console.error("API failed completely, returning fallback plan.", error);
@@ -179,23 +203,22 @@ export const generateContextualInsight = async (status: DailyCheckin, userName: 
         };
     }
 
-    try {
-        return await simpleGenerate(async (modelName) => {
-            const prompt = `
+    const aiPrompt = `
             Analiza estado: Energía ${status.energyLevel}/10, Sueño ${status.sleepQuality}, Dolor ${status.soreness}, Ánimo ${status.mood}.
             Usuario: ${userName}.
             Genera un insight corto y motivador en formato JSON válido con las propiedades: type, title, message, actionLabel, suggestedActivity.
             Response must be pure JSON.
             `;
-
+    try {
+        return await safeModelExecute(async (modelName) => {
             const result = await genAI!.models.generateContent({
                 model: modelName,
-                contents: prompt,
+                contents: aiPrompt,
                 config: { responseMimeType: "application/json" }
             });
             const text = (result.text || "").replace(/```json|```/g, '').trim();
             return JSON.parse(text) as AIInsight;
-        });
+        }, { prompt: aiPrompt, jsonMode: true });
     } catch (error) {
         console.error("Error generating insight:", error);
         return { type: 'motivation', title: `Vamos ${userName}`, message: 'Haz lo mejor que puedas hoy.', actionLabel: 'Entrenar' };
@@ -207,23 +230,25 @@ export const getAICoachResponse = async (prompt: string, userName: string = 'Usu
         return { text: "Error: API Key no configurada.", sources: [] };
     }
 
-    try {
-        return await simpleGenerate(async (modelName) => {
-            const systemInstruction = `
+    const systemInstruction = `
             Eres el AI Coach de FitnessFlow Pro.
             Estás hablando con ${userName}.
             Responde en español, sé motivador, amigable y experto.
             Usa emojis. Sé conciso. No des consejos médicos.
             `;
 
-            const fullPrompt = `${systemInstruction}\n\nUser: ${prompt}`;
+    const fullPrompt = `${systemInstruction}\n\nUser: ${prompt}`;
 
+    try {
+        const response = await safeModelExecute(async (modelName) => {
             const result = await genAI!.models.generateContent({
                 model: modelName,
                 contents: fullPrompt
             });
             return { text: result.text || "...", sources: [] };
-        });
+        }, { prompt: fullPrompt, systemInstruction });
+
+        return typeof response === 'string' ? { text: response, sources: [] } : response;
 
     } catch (error: any) {
         console.error("AI Chat Error:", error);
@@ -240,14 +265,15 @@ export const getAICoachResponse = async (prompt: string, userName: string = 'Usu
 
 export const getDailyWellnessTip = async (): Promise<string> => {
     if (!genAI) return "¡Mantente activo y bebe agua!";
+    const tipPrompt = "Genera un consejo de fitness corto y motivador para hoy en español.";
     try {
-        return await simpleGenerate(async (modelName) => {
+        return await safeModelExecute(async (modelName) => {
             const result = await genAI!.models.generateContent({
                 model: modelName,
-                contents: "Genera un consejo de fitness corto y motivador para hoy en español."
+                contents: tipPrompt
             });
             return result.text || "¡A moverse!";
-        });
+        }, { prompt: tipPrompt });
     } catch (e) {
         return "El descanso es clave para el progreso.";
     }
@@ -278,9 +304,7 @@ export const getGymAdminAdvice = async (prompt: string): Promise<{ text: string;
         return { text: "⚠️ API Key no configurada. Verifica tu archivo .env.local", sources: [] };
     }
 
-    try {
-        return await simpleGenerate(async (modelName) => {
-            const systemInstruction = `
+    const systemInstruction = `
             Eres un Consultor Experto en Gestión de Gimnasios y Negocios Fitness.
             Tu objetivo es ayudar al administrador del gimnasio "El Templo" a optimizar su negocio.
             
@@ -298,14 +322,18 @@ export const getGymAdminAdvice = async (prompt: string): Promise<{ text: string;
             4. Usa formato Markdown (negritas, listas) para facilitar la lectura.
             `;
 
-            const fullPrompt = `${systemInstruction}\n\nPregunta del Administrador: ${prompt}`;
+    const fullPrompt = `${systemInstruction}\n\nPregunta del Administrador: ${prompt}`;
 
+    try {
+        const response = await safeModelExecute(async (modelName) => {
             const result = await genAI!.models.generateContent({
                 model: modelName,
                 contents: fullPrompt
             });
             return { text: result.text || "...", sources: [] };
-        });
+        }, { prompt: fullPrompt, systemInstruction });
+
+        return typeof response === 'string' ? { text: response, sources: [] } : response;
 
     } catch (error: any) {
         console.error("AI Admin Chat Error:", error);
@@ -316,9 +344,7 @@ export const getGymAdminAdvice = async (prompt: string): Promise<{ text: string;
 export const generateServiceImageMetadata = async (name: string, description: string): Promise<{ keyword: string }> => {
     if (!genAI) return { keyword: 'fitness' };
 
-    try {
-        return await simpleGenerate(async (modelName) => {
-            const prompt = `
+    const aiPrompt = `
             Act as a Search Engine Optimization expert for stock images.
             Service Name: "${name}"
             Description: "${description}"
@@ -331,14 +357,15 @@ export const generateServiceImageMetadata = async (name: string, description: st
             
             Return ONLY the keyword. No json, no quotes.
             `;
-
+    try {
+        return await safeModelExecute(async (modelName) => {
             const result = await genAI!.models.generateContent({
                 model: modelName,
-                contents: prompt
+                contents: aiPrompt
             });
             const keyword = (result.text || "fitness").trim().replace(/"/g, '');
             return { keyword };
-        });
+        }, { prompt: aiPrompt });
     } catch (error) {
         console.error("Image Gen Error:", error);
         return { keyword: 'fitness' };

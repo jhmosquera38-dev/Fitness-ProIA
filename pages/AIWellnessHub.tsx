@@ -200,7 +200,7 @@ const LiveCoach: React.FC = () => {
 
             // Conectar a la API Live
             const sessionPromise = ai.live.connect({
-                model: 'gemini-2.5-flash', // Modelo actualizado a 2.5 para soporte 2026
+                model: 'gemini-2.0-flash', // Modelo actualizado a 2.0 estable para 2026
                 callbacks: {
                     onopen: () => {
                         setIsSessionActive(true);

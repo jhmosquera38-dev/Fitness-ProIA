@@ -39,9 +39,9 @@ export const userService = {
             email: user.email,
             full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
             role: accountType,
-            plan: 'básico', // Default trial plan
+            plan: 'premium', // Default trial plan (Premium)
             subscription_status: 'trial',
-            trial_end_date: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
+            trial_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
             has_completed_onboarding: false,
             is_gym_member: false
         };
