@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
           theme_color: '#ffffff',
           background_color: '#ffffff',
           display: 'standalone',
-          start_url: '/Fitness-ProIA/', // Updated to match base path
+          start_url: mode === 'production' ? '/Fitness-ProIA/' : '/',
           orientation: 'portrait',
           icons: [
             {
@@ -73,12 +73,13 @@ export default defineConfig(({ mode }) => {
         }
       })
     ],
-    base: '/Fitness-ProIA/',
+    base: mode === 'production' ? '/Fitness-ProIA/' : '/',
     build: {
       outDir: 'build_output'
     },
     server: {
-      port: 3000
+      port: 3001,
+      host: true
     },
     define: {
       'process.env.API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY || '')
