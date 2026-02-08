@@ -249,7 +249,7 @@ const LiveCoach: React.FC = () => {
                                 mimeType: 'audio/pcm;rate=16000',
                             };
 
-                            sessionPromise.then((session) => {
+                            sessionPromise.then((session: any) => {
                                 session.sendRealtimeInput({ media: pcmBlob });
                             });
                         };
@@ -286,7 +286,7 @@ const LiveCoach: React.FC = () => {
                             sources.add(source);
                         }
                     },
-                    onerror: (e) => {
+                    onerror: (e: any) => {
                         console.error('Live session error:', e);
                         setTranscription(prev => [...prev, 'Error: Hubo un problema con la conexión.']);
                         stopSession();
