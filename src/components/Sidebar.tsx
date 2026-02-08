@@ -42,12 +42,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ navItems, activeItem, onNaviga
             return (
               <li key={item.name}>
                 <button
-                  id={`nav-item-${index}`}
+                  id={`sidebar-item-${index}`}
                   onClick={() => onNavigate(item.name)}
                   aria-current={isActive ? 'page' : undefined}
                   className={`relative w-full flex items-center gap-4 px-3 py-3 lg:px-4 rounded-2xl text-sm font-medium transition-all duration-300 group outline-none ${isActive
-                      ? 'bg-brand-primary text-brand-dark shadow-neon scale-105 font-bold'
-                      : 'text-slate-400 hover:bg-white/5 hover:text-white hover:scale-105'
+                    ? 'bg-brand-primary text-brand-dark shadow-neon scale-105 font-bold'
+                    : 'text-slate-400 hover:bg-white/5 hover:text-white hover:scale-105'
                     }`}
                 >
                   <div className={`transition-transform duration-300 flex-shrink-0 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} aria-hidden="true">

@@ -77,8 +77,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ navItems, acti
                                     key={item.name}
                                     onClick={() => handleNavigate(item.name)}
                                     className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 border-l-4 ${activeItem === item.name
-                                            ? 'border-brand-primary text-brand-primary bg-green-50 dark:bg-green-900/10 font-semibold'
-                                            : 'border-transparent text-slate-600 dark:text-slate-300'
+                                        ? 'border-brand-primary text-brand-primary bg-green-50 dark:bg-green-900/10 font-semibold'
+                                        : 'border-transparent text-slate-600 dark:text-slate-300'
                                         }`}
                                 >
                                     <div className={`w-5 h-5 ${activeItem === item.name ? 'text-brand-primary' : 'text-slate-400'}`}>{item.icon}</div>
@@ -98,10 +98,11 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ navItems, acti
                             key={item.name}
                             onClick={() => handleNavigate(item.name)}
                             className={`flex-1 flex flex-col items-center justify-center transition-all duration-200 p-1 rounded-xl focus:outline-none active:scale-95 ${activeItem === item.name
-                                    ? 'text-brand-primary'
-                                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+                                ? 'text-brand-primary'
+                                : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
                                 }`}
                             aria-current={activeItem === item.name ? 'page' : undefined}
+                            id={`mobile-item-${navItems.findIndex(n => n.name === item.name)}`}
                         >
                             <div className={`w-6 h-6 transition-transform duration-200 ${activeItem === item.name ? '-translate-y-1 scale-110' : ''}`}>{item.icon}</div>
                             <span className={`text-[10px] mt-1 truncate max-w-full px-1 ${activeItem === item.name ? 'font-bold opacity-100' : 'font-normal opacity-80'}`}>{item.name}</span>
@@ -114,8 +115,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ navItems, acti
                             ref={buttonRef}
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className={`flex-1 flex flex-col items-center justify-center transition-all duration-200 p-1 rounded-xl focus:outline-none active:scale-95 ${isMenuOpen || isHiddenItemActive
-                                    ? 'text-brand-primary'
-                                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+                                ? 'text-brand-primary'
+                                : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
                                 }`}
                         >
                             <div className={`w-6 h-6 transition-transform duration-200 ${isMenuOpen ? '-translate-y-1 scale-110' : ''}`}><MoreIcon /></div>

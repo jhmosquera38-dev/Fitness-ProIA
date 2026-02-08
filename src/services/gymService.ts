@@ -1,4 +1,4 @@
-import { supabase } from '../src/lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 
 // TIPO: Definición flexible para el Dashboard basada en la tabla Profiles
 export interface GymMember {

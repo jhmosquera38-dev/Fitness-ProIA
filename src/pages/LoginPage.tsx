@@ -48,7 +48,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigateToRegister, onNa
         }
 
         try {
-            const { data, error } = await (await import('../src/lib/supabaseClient')).supabase.auth.signInWithPassword({
+            const { data, error } = await (await import('../lib/supabaseClient')).supabase.auth.signInWithPassword({
                 email,
                 password,
             });
@@ -68,7 +68,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onNavigateToRegister, onNa
                 // For now, we trust the input accountType or query the profile?
                 // Ideally, we should fetch the profile to confirm accountType matches the selected tab.
 
-                const supabase = (await import('../src/lib/supabaseClient')).supabase;
+                const supabase = (await import('../lib/supabaseClient')).supabase;
                 const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
 
                 const role = profile?.role || accountType;

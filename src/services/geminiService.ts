@@ -73,9 +73,10 @@ const generatePrompt = (profile: UserProfile, dailyStatus?: DailyCheckin): strin
 // MODEL FALLBACK SYSTEM
 // ----------------------------------------------------------------------------
 const MODEL_CANDIDATES = [
-    "gemini-1.5-flash",       // Primary: Fast & Cheap
-    "gemini-pro",             // Fallback: Stable
-    "gemini-1.0-pro"          // Legacy Fallback
+    "gemini-1.5-flash-001",   // Stable Flash version
+    "gemini-1.5-flash-002",   // Newer Flash version (if available)
+    "gemini-1.5-pro-001",     // Stable Pro version
+    "gemini-1.5-flash"        // Generic alias (last resort)
 ];
 
 async function safeModelExecute(
@@ -87,18 +88,19 @@ async function safeModelExecute(
     // Phase 1: Try Direct Gemini Models
     for (const modelName of MODEL_CANDIDATES) {
         try {
+            console.log(`[Gemini] Attempting with model: ${modelName}`);
             return await callback(modelName);
         } catch (error: any) {
             lastError = error;
-            // Retry on typical temporary errors
-            const isRetryable = error?.message?.includes('404') || error?.status === 404 ||
-                error?.message?.includes('429') || error?.status === 429 ||
-                error?.message?.includes('503') || error?.status === 503;
+            console.warn(`[Gemini] Failed with ${modelName}:`, error.message || error);
 
-            if (!isRetryable) throw error;
-            console.warn(`Gemini Direct (${modelName}) failed. Error: ${error.message}`);
+            // Should we retry? 
+            // If it's a 404 (Model not found) or 503 (Overloaded), we try the next candidate.
+            // If it's a 400 (Bad Request), it might be the prompt, but we usually try next model anyway just in case specific model param is wrong.
         }
     }
+
+    console.warn("[Gemini] All direct models failed. Switching to OpenRouter...");
 
     // Phase 2: Ultimate Fallback - OpenRouter (if API key available)
     try {
@@ -117,7 +119,11 @@ async function safeModelExecute(
             return result.text;
         }
     } catch (orError: any) {
-        console.error("OpenRouter Fallback failed:", orError);
+        if (orError.message.includes("User not found")) {
+            console.error("OpenRouter Critical Error: API Key invalid or User not found.");
+        } else {
+            console.error("OpenRouter Fallback failed:", orError);
+        }
     }
 
     throw lastError; // If everything fails
@@ -253,6 +259,8 @@ export const getAICoachResponse = async (prompt: string, userName: string = 'Usu
             msg = `⏳ Estoy recibiendo demasiadas solicitudes. Por favor, intenta de nuevo en unos segundos.`;
         } else if (error.message?.includes('404') || error.status === 404) {
             msg = `🔧 Estamos actualizando los modelos de IA. Intenta de nuevo en un momento.`;
+        } else if (error.message?.includes('API key') || error.toString().includes('API key')) {
+            msg = `🔑 Error de configuración de API Key. Por favor verifica tu archivo .env.local.`;
         }
         return { text: msg, sources: [] };
     }

@@ -160,7 +160,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigateToLogin, o
 
         try {
             // 1. Sign Up
-            const { data: authData, error: authError } = await (await import('../src/lib/supabaseClient')).supabase.auth.signUp({
+            const { data: authData, error: authError } = await (await import('../lib/supabaseClient')).supabase.auth.signUp({
                 email,
                 password,
                 options: {
@@ -176,7 +176,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigateToLogin, o
             if (!authData.user) throw new Error("No se pudo crear el usuario");
 
             const userId = authData.user.id;
-            const supabase = (await import('../src/lib/supabaseClient')).supabase;
+            const supabase = (await import('../lib/supabaseClient')).supabase;
 
             // 2. Insert Profile (Upsert to be safe)
             const { error: profileError } = await supabase

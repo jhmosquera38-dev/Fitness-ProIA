@@ -151,6 +151,31 @@ const DailyTip: React.FC = () => {
     );
 };
 
+// Componente: Prompt Chips (Sugerencias Rápidas)
+const PromptChips: React.FC<{ onSelect: (text: string) => void }> = ({ onSelect }) => {
+    const chips = [
+        { emoji: "🏋️", text: "Rutina de 30 min", prompt: "Créame una rutina de cuerpo completo de 30 minutos sin equipo." },
+        { emoji: "🥗", text: "Idea de Cena", prompt: "Dame una opción de cena saludable, alta en proteínas y baja en carbohidratos." },
+        { emoji: "🧘‍♂️", text: "Calmar Ansiedad", prompt: "Me siento ansioso. ¿Puedes guiarme en un ejercicio de respiración breve?" },
+        { emoji: "😴", text: "Mejorar Sueño", prompt: "Tengo problemas para dormir. ¿Qué hábitos me recomiendas para esta noche?" },
+    ];
+
+    return (
+        <div className="flex flex-wrap gap-2 mb-4 animate-fade-in-up">
+            {chips.map((chip, index) => (
+                <button
+                    key={index}
+                    onClick={() => onSelect(chip.prompt)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-brand-primary hover:text-white dark:hover:bg-brand-primary rounded-full text-xs font-medium text-slate-600 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"
+                >
+                    <span>{chip.emoji}</span>
+                    <span>{chip.text}</span>
+                </button>
+            ))}
+        </div>
+    );
+};
+
 // ============================================================================
 // COMPONENTE: LIVE COACH (Voz en Tiempo Real)
 // ============================================================================
@@ -200,7 +225,7 @@ const LiveCoach: React.FC = () => {
 
             // Conectar a la API Live
             const sessionPromise = ai.live.connect({
-                model: 'gemini-2.0-flash', // Modelo actualizado a 2.0 estable para 2026
+                model: 'gemini-2.0-flash-exp', // Modelo actualizado a 2.0 experimental
                 callbacks: {
                     onopen: () => {
                         setIsSessionActive(true);
@@ -360,18 +385,19 @@ export const AIWellnessHub: React.FC<AIWellnessHubProps> = ({ user }) => {
     }, [messages]);
 
     // Manejo de envío de mensajes de texto
-    const handleSend = async () => {
-        if (input.trim() === '' || isLoading) return;
+    const handleSend = async (manualInput?: string) => {
+        const textToSend = manualInput || input;
+        if (textToSend.trim() === '' || isLoading) return;
 
-        const userMessage: ChatMessage = { sender: 'user', text: input };
+        const userMessage: ChatMessage = { sender: 'user', text: textToSend };
         setMessages(prev => [...prev, userMessage]);
-        const currentInput = input;
-        setInput('');
+
+        if (!manualInput) setInput('');
         setIsLoading(true);
 
         try {
             // Llamada al servicio Gemini
-            const { text, sources } = await getAICoachResponse(currentInput, user.name);
+            const { text, sources } = await getAICoachResponse(textToSend, user.name);
             const aiMessage: ChatMessage = { sender: 'ai', text, sources };
             setMessages(prev => [...prev, aiMessage]);
         } catch (error) {
@@ -402,10 +428,21 @@ export const AIWellnessHub: React.FC<AIWellnessHubProps> = ({ user }) => {
                         </div>
                     </div>
 
-                    <div className="flex-grow p-4 overflow-y-auto bg-slate-50 dark:bg-slate-900 h-96 transition-colors">
-                        {messages.map((msg, index) => (
-                            msg.sender === 'ai' ? <AIMessage key={index} message={msg} /> : <UserMessage key={index} text={msg.text} name={user.name} />
-                        ))}
+                    <div className="flex-grow p-4 overflow-y-auto bg-slate-50 dark:bg-slate-900 h-96 transition-colors flex flex-col">
+                        <div className="flex-1">
+                            {messages.map((msg, index) => (
+                                msg.sender === 'ai' ? <AIMessage key={index} message={msg} /> : <UserMessage key={index} text={msg.text} name={user.name} />
+                            ))}
+                        </div>
+
+                        {/* Prompt Chips Integration */}
+                        {messages.length === 1 && !isLoading && (
+                            <div className="mt-auto px-2">
+                                <p className="text-xs text-slate-400 dark:text-slate-500 mb-2 font-medium uppercase tracking-wider">Sugerencias para empezar:</p>
+                                <PromptChips onSelect={handleSend} />
+                            </div>
+                        )}
+
                         {/* Indicador de carga animado */}
                         {isLoading && (
                             <div className="flex gap-3 my-4">
@@ -433,7 +470,7 @@ export const AIWellnessHub: React.FC<AIWellnessHubProps> = ({ user }) => {
                                 className="w-full pl-4 pr-12 py-3 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-full text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-400 focus:ring-2 focus:ring-brand-primary focus:outline-none transition-colors"
                                 disabled={isLoading}
                             />
-                            <button onClick={handleSend} disabled={isLoading} className="absolute inset-y-0 right-0 flex items-center justify-center w-12 h-full text-white bg-brand-primary rounded-full hover:bg-brand-secondary disabled:bg-slate-400 transition-colors">
+                            <button onClick={() => handleSend()} disabled={isLoading} className="absolute inset-y-0 right-0 flex items-center justify-center w-12 h-full text-white bg-brand-primary rounded-full hover:bg-brand-secondary disabled:bg-slate-400 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                             </button>
                         </div>

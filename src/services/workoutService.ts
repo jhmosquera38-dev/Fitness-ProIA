@@ -1,4 +1,4 @@
-import { supabase } from "../src/lib/supabaseClient";
+import { supabase } from '../lib/supabaseClient';
 import { UserProfile, WorkoutPlan } from '../types';
 
 export interface SavedWorkoutPlan {

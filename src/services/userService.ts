@@ -1,4 +1,4 @@
-import { supabase } from '../src/lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import { DailyCheckin } from '../types';
 
 export interface UserProgressLog {

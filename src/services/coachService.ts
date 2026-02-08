@@ -1,4 +1,4 @@
-import { supabase } from '../src/lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import { CoachService, Client } from '../types';
 export type { CoachService, Client };
 
