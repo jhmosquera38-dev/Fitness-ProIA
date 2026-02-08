@@ -56,7 +56,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => (
     </div>
 );
 
-export const CoachDashboard: React.FC<CoachDashboardProps> = ({ user, onNavigate }) => {
+export const CoachDashboard: React.FC<CoachDashboardProps> = ({ user, onNavigate, onStartTour }) => {
 
     const [isLoading, setIsLoading] = useState(true);
     const [stats, setStats] = useState({ clients: 0, income: 0, rating: 0 });
