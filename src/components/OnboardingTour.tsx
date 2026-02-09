@@ -158,64 +158,99 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ steps, onComplet
     // Tooltip positioning logic
     let tooltipStyle: React.CSSProperties = {};
     let arrowStyle: React.CSSProperties = {};
-    const gap = 16; // Increased gap for arrow
-    const arrowSize = 8; // Size of the arrow in pixels
+    const gap = 16;
+    const arrowSize = 8;
+    const tooltipWidth = 288; // Equivalent to w-72
 
-    // Safety check for 0,0 dimensions (should be handled by findVisibleTarget but double check)
+    // Safety check for 0,0 dimensions
     if (targetRect.width === 0 || targetRect.height === 0) return null;
 
-    if (currentStep.position === 'right') {
+    const isMobileOrTablet = window.innerWidth < 1024;
+
+    if (isMobileOrTablet) {
+        // Modal-like centered positioning for mobile/tablet to guarantee visibility
         tooltipStyle = {
-            top: targetRect.top + targetRect.height / 2 - 60, // Center vertically roughly
-            left: targetRect.right + gap,
-            transform: 'translateY(-20%)' // Adjustment to center better
-        };
-        arrowStyle = {
-            left: -arrowSize,
-            top: '30%',
-            marginTop: -arrowSize,
-            borderRightColor: 'white', // Function of theme, ideally
-            borderWidth: `${arrowSize}px ${arrowSize}px ${arrowSize}px 0`,
-            borderColor: `transparent white transparent transparent`
-        };
-    } else if (currentStep.position === 'bottom') {
-        tooltipStyle = {
-            top: targetRect.bottom + gap,
-            left: targetRect.left + targetRect.width / 2 - 144, // Center horizontally (144 is half of w-72)
-        };
-        arrowStyle = {
-            top: -arrowSize,
+            top: '50%',
             left: '50%',
-            marginLeft: -arrowSize,
-            borderBottomColor: 'white',
-            borderWidth: `0 ${arrowSize}px ${arrowSize}px ${arrowSize}px`,
-            borderColor: `transparent transparent white transparent`
+            transform: 'translate(-50%, -50%)', // Fully centered to avoid bottom nav/cutoffs
+            width: 'calc(100% - 32px)',
+            maxWidth: '380px',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            position: 'fixed' // Ensure it stays centered regardless of scroll
         };
-    } else if (currentStep.position === 'left') {
-        tooltipStyle = {
-            top: targetRect.top,
-            right: window.innerWidth - targetRect.left + gap,
-        };
-        arrowStyle = {
-            right: -arrowSize,
-            top: '20px',
-            borderLeftColor: 'white',
-            borderWidth: `${arrowSize}px 0 ${arrowSize}px ${arrowSize}px`,
-            borderColor: `transparent transparent transparent white`
-        };
-    } else if (currentStep.position === 'top') {
-        tooltipStyle = {
-            bottom: window.innerHeight - targetRect.top + gap,
-            left: targetRect.left + targetRect.width / 2 - 144,
-        };
-        arrowStyle = {
-            bottom: -arrowSize,
-            left: '50%',
-            marginLeft: -arrowSize,
-            borderTopColor: 'white',
-            borderWidth: `${arrowSize}px ${arrowSize}px 0 ${arrowSize}px`,
-            borderColor: `white transparent transparent transparent`
-        };
+        arrowStyle = { display: 'none' };
+    } else {
+        // Smart Desktop positioning with flipping
+        const padding = 20;
+        const tooltipHeight = 250; // Estimated max height
+        let bestPos = currentStep.position;
+
+        // Auto-flip vertical positions
+        if (bestPos === 'bottom' && targetRect.bottom + gap + tooltipHeight > window.innerHeight) {
+            bestPos = 'top';
+        } else if (bestPos === 'top' && targetRect.top - gap - tooltipHeight < 0) {
+            bestPos = 'bottom';
+        }
+
+        // Auto-flip horizontal positions
+        if (bestPos === 'right' && targetRect.right + gap + tooltipWidth > window.innerWidth) {
+            bestPos = 'left';
+        } else if (bestPos === 'left' && targetRect.left - gap - tooltipWidth < 0) {
+            bestPos = 'right';
+        }
+
+        if (bestPos === 'right') {
+            tooltipStyle = {
+                top: Math.max(padding, Math.min(window.innerHeight - tooltipHeight, targetRect.top + targetRect.height / 2 - 100)),
+                left: targetRect.right + gap,
+            };
+            arrowStyle = {
+                left: -arrowSize,
+                top: '40px',
+                borderRightColor: 'currentColor',
+                borderWidth: `${arrowSize}px ${arrowSize}px ${arrowSize}px 0`,
+                borderColor: `transparent currentColor transparent transparent`
+            };
+        } else if (bestPos === 'bottom') {
+            tooltipStyle = {
+                top: targetRect.bottom + gap,
+                left: Math.max(padding, Math.min(window.innerWidth - tooltipWidth - padding, targetRect.left + targetRect.width / 2 - tooltipWidth / 2)),
+            };
+            arrowStyle = {
+                top: -arrowSize,
+                left: '50%',
+                marginLeft: -arrowSize,
+                borderBottomColor: 'currentColor',
+                borderWidth: `0 ${arrowSize}px ${arrowSize}px ${arrowSize}px`,
+                borderColor: `transparent transparent currentColor transparent`
+            };
+        } else if (bestPos === 'left') {
+            tooltipStyle = {
+                top: Math.max(padding, Math.min(window.innerHeight - tooltipHeight, targetRect.top)),
+                right: window.innerWidth - targetRect.left + gap,
+            };
+            arrowStyle = {
+                right: -arrowSize,
+                top: '40px',
+                borderLeftColor: 'currentColor',
+                borderWidth: `${arrowSize}px 0 ${arrowSize}px ${arrowSize}px`,
+                borderColor: `transparent transparent transparent currentColor`
+            };
+        } else if (bestPos === 'top') {
+            tooltipStyle = {
+                bottom: window.innerHeight - targetRect.top + gap,
+                left: Math.max(padding, Math.min(window.innerWidth - tooltipWidth - padding, targetRect.left + targetRect.width / 2 - tooltipWidth / 2)),
+            };
+            arrowStyle = {
+                bottom: -arrowSize,
+                left: '50%',
+                marginLeft: -arrowSize,
+                borderTopColor: 'currentColor',
+                borderWidth: `${arrowSize}px ${arrowSize}px 0 ${arrowSize}px`,
+                borderColor: `currentColor transparent transparent transparent`
+            };
+        }
     }
 
     // Determine arrow color based on dark mode (naive check, better to pass theme prop or use CSS var)
@@ -254,28 +289,25 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ steps, onComplet
 
             {/* Tooltip Card */}
             <div
-                className="absolute w-72 bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-5 animate-scale-in border border-slate-100 dark:border-slate-700"
+                className="absolute w-[calc(100%-32px)] sm:w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-6 animate-scale-in border border-slate-100 dark:border-slate-700 pointer-events-auto"
                 style={tooltipStyle}
             >
-                {/* Visual Arrow (CSS Triangle) - styled via style prop for position, but we need colors handled by class */}
-                <div
-                    className="absolute w-0 h-0 border-solid"
-                    style={arrowStyle}
-                />
+                {/* Visual Arrow (Only on Desktop) */}
+                {!isMobileOrTablet && (
+                    <div
+                        className="absolute w-0 h-0 border-solid"
+                        style={arrowStyle}
+                    />
+                )}
 
-                {/* Arrow override for dark mode via a specific class trick or just simpler relative positioning */}
-                {/* Since style overrides classes, we need to be careful. The current arrowStyle sets border colors to white. 
-                   For dark mode support without complexities, let's make the arrow a div that inherits bg.
-                */}
-
-                <div className="flex justify-between items-start mb-3">
-                    <h3 className="font-bold text-slate-800 dark:text-white text-lg leading-tight">{currentStep.title}</h3>
-                    <span className="text-[10px] font-bold tracking-wider text-slate-500 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-full uppercase">
-                        PASO {currentStepIndex + 1}/{steps.length}
+                <div className="flex justify-between items-start mb-4">
+                    <h3 className="font-extrabold text-slate-900 dark:text-white text-xl leading-tight pr-4">{currentStep.title}</h3>
+                    <span className="shrink-0 text-[10px] font-black tracking-widest text-brand-primary bg-brand-primary/10 dark:bg-brand-primary/20 px-2.5 py-1 rounded-full uppercase border border-brand-primary/20">
+                        {currentStepIndex + 1}/{steps.length}
                     </span>
                 </div>
 
-                <p className="text-slate-600 dark:text-slate-300 text-sm mb-5 leading-relaxed font-medium">
+                <p className="text-slate-600 dark:text-slate-300 text-base mb-6 leading-relaxed">
                     {currentStep.content}
                 </p>
 
