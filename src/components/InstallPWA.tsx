@@ -53,7 +53,7 @@ export const InstallPWA: React.FC = () => {
     // Estado minimizado: Mostrar solo un icono pequeño flotante
     if (isMinimized) {
         return (
-            <div className="fixed bottom-4 right-4 z-50 animate-fade-in print:hidden">
+            <div className="fixed bottom-24 sm:bottom-4 right-4 z-50 animate-fade-in print:hidden">
                 <button
                     onClick={() => setIsMinimized(false)}
                     className="bg-slate-800 text-brand-primary p-3 rounded-full shadow-lg border border-brand-primary/30 hover:scale-110 transition-transform"
@@ -69,7 +69,7 @@ export const InstallPWA: React.FC = () => {
     }
 
     return (
-        <div className="fixed bottom-4 right-4 z-50 animate-slide-up print:hidden flex flex-col items-end">
+        <div className="fixed bottom-24 sm:bottom-4 right-4 z-50 animate-slide-up print:hidden flex flex-col items-end">
             {/* Botón de cerrar/minimizar */}
             <button
                 onClick={(e) => { e.stopPropagation(); setIsMinimized(true); }}

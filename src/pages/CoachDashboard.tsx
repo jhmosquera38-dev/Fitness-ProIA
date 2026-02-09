@@ -88,37 +88,24 @@ export const CoachDashboard: React.FC<CoachDashboardProps> = ({ user, onNavigate
                 // const profile = await UserService.getProfile(user.id);
 
                 // Mock data for now to ensure dashboard renders
+                // Mok data removed to ensure dashboard shows real state
                 setStats({
-                    clients: 12,
-                    income: 4500,
-                    rating: 4.8
+                    clients: 0,
+                    income: 0,
+                    rating: 0
                 });
 
-                // 2. Fetch Services
-                setServices([
-                    { id: 1, name: 'Entrenamiento Personal', price: 50, description: 'Sesiones 1 a 1 personalizadas.', activeClients: 5, rating: 4.9 },
-                    { id: 2, name: 'Asesoría Nutricional', price: 30, description: 'Planes de alimentación mensuales.', activeClients: 7, rating: 4.7 }
-                ]);
+                // 2. Fetch Services (Reset to empty)
+                setServices([]);
 
-                // 3. Fetch Classes
-                // const classes = await CoachService.getClasses(user.id);
-                setMyClasses([
-                    { id: '101', name: 'Yoga al Amanecer', schedule: [{ day: '2023-10-27', time: '07:00' }], status: 'active' },
-                    { id: '102', name: 'HIIT Intenso', schedule: [{ day: '2023-10-28', time: '18:00' }], status: 'active' }
-                ]);
+                // 3. Fetch Classes (Reset to empty)
+                setMyClasses([]);
 
-                // 4. Fetch Clients
-                setClients([
-                    { id: 1, name: 'Juan Perez', memberships: 'Premium', progress: 75 },
-                    { id: 2, name: 'Maria Gomez', memberships: 'Básico', progress: 40 },
-                    { id: 3, name: 'Carlos Diaz', memberships: 'Premium', progress: 90 }
-                ]);
+                // 4. Fetch Clients (Reset to empty)
+                setClients([]);
 
-                // 5. Fetch Reviews
-                setReviews([
-                    { id: 1, client: 'Ana L.', date: 'Hace 2 días', rating: 5, comment: 'Excelente entrenador, muy motivador.' },
-                    { id: 2, client: 'Pedro R.', date: 'Hace 1 semana', rating: 4, comment: 'Buenas rutinas, pero muy intensas.' }
-                ]);
+                // 5. Fetch Reviews (Reset to empty)
+                setReviews([]);
 
             } catch (error) {
                 console.error("Error loading coach data:", error);
