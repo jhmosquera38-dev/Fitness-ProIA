@@ -119,11 +119,16 @@ async function safeModelExecute(
             return result.text;
         }
     } catch (orError: any) {
-        if (orError.message.includes("User not found")) {
+        if (orError.message.includes("User not found") || orError.status === 401) {
             console.error("OpenRouter Critical Error: API Key invalid or User not found.");
         } else {
             console.error("OpenRouter Fallback failed:", orError);
         }
+    }
+
+    // Comprehensive error messaging for the final throw
+    if (lastError?.message?.includes('API key')) {
+        throw new Error("Invalid Gemini API Key. Please check your .env.local file.");
     }
 
     throw lastError; // If everything fails
