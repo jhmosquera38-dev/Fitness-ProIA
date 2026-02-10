@@ -9,10 +9,17 @@ import { openRouterService } from './openRouterService';
 
 let genAI: GoogleGenerativeAI | null = null;
 try {
+    // Attempt multiple ways to get the API key to ensure compatibility across environments
     // @ts-ignore
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (apiKey && typeof apiKey === 'string' && apiKey.length > 0) {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY ||
+        // @ts-ignore
+        (typeof process !== 'undefined' && process.env.API_KEY) ||
+        '';
+
+    if (apiKey && typeof apiKey === 'string' && apiKey.length > 5) {
         genAI = new GoogleGenerativeAI(apiKey);
+    } else {
+        console.warn("[Gemini] API Key missing or too short. Check your .env.local file.");
     }
 } catch (e) {
     console.warn("Gemini API client could not be initialized:", e);
@@ -73,10 +80,11 @@ const generatePrompt = (profile: UserProfile, dailyStatus?: DailyCheckin): strin
 // MODEL FALLBACK SYSTEM
 // ----------------------------------------------------------------------------
 const MODEL_CANDIDATES = [
-    "gemini-1.5-flash-001",   // Stable Flash version
-    "gemini-1.5-flash-002",   // Newer Flash version (if available)
-    "gemini-1.5-pro-001",     // Stable Pro version
-    "gemini-1.5-flash"        // Generic alias (last resort)
+    "gemini-2.5-flash-lite",   // Validated for newer keys
+    "gemini-2.0-flash-lite",   // Validated fallback
+    "gemini-1.5-flash-latest", // Standard fallback
+    "gemini-1.5-flash",
+    "gemini-pro"
 ];
 
 async function safeModelExecute(
