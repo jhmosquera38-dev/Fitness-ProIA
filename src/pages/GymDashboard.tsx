@@ -121,9 +121,8 @@ export const GymDashboard: React.FC<GymDashboardProps> = ({ onNavigate }) => {
         const total = members.length;
         const active = members.filter(m => m.status === 'Al día').length;
         const atRisk = members.filter(m => m.status === 'Vencido');
-        // Estimación de ingresos: (Activos * $30) - muy simplificado para demo
-        // O podríamos sumar si tuviéramos tabla de pagos
-        const estimatedIncome = active * 30000; // Asumiendo 30k COP/mes avg
+        // Estimación de ingresos: (Activos * $29.900) - Alineado con Plan Premium Atleta
+        const estimatedIncome = active * 29900;
 
         return {
             total,

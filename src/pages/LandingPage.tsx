@@ -36,14 +36,14 @@ const userPlans = [
     },
     {
         name: 'Básico',
-        price: '15.000',
+        price: '14.900',
         description: 'Perfecto para comenzar tu journey fitness',
         features: ['Todo del plan Gratis', 'Rutinas básicas', 'Seguimiento de progreso', 'Biblioteca completa'],
         isPopular: false,
     },
     {
         name: 'Premium',
-        price: '20.000',
+        price: '29.900',
         description: 'La experiencia completa para resultados serios',
         features: ['Todo del plan Básico', 'Rutinas personalizadas', 'Clases grupales ilimitadas', 'AI Coach personalizado', 'Análisis de progreso avanzado'],
         isPopular: true,
@@ -60,16 +60,16 @@ const gymPlans = [
     },
     {
         name: 'Básico',
-        price: '50.000',
+        price: '139.000',
         description: 'Ideal para gimnasios pequeños que crecen',
-        features: ['Gestión de hasta 100 miembros', 'Creación de clases y horarios', 'Panel de administración', 'Soporte por email'],
+        features: ['Gestión de miembros e Inventario', 'Creación de clases y horarios', 'Panel de administración', 'Soporte por email'],
         isPopular: false,
     },
     {
         name: 'Premium',
-        price: '70.000',
+        price: '269.000',
         description: 'La solución completa para tu negocio',
-        features: ['Miembros ilimitados', 'Todo del plan Básico', 'Reportes de rendimiento avanzados', 'Automatización de Marketing', 'Soporte prioritario 24/7'],
+        features: ['Marketing Automation + Finanzas', 'Todo del plan Básico', 'Reportes de rendimiento avanzados', 'Gestión de múltiples entrenadores', 'Soporte prioritario 24/7'],
         isPopular: true,
     }
 ];
@@ -84,16 +84,16 @@ const trainerPlans = [
     },
     {
         name: 'Básico',
-        price: '25.000',
+        price: '45.000',
         description: 'Potencia tu marca personal',
-        features: ['Gestión de hasta 20 clientes', 'Creación de rutinas personalizadas', 'Perfil destacado', 'Chat básico con clientes'],
+        features: ['Gestión de hasta 15 clientes', 'Agenda Inteligente', 'Perfil destacado', 'Chat básico con clientes'],
         isPopular: false,
     },
     {
         name: 'Premium',
-        price: '30.000',
+        price: '85.000',
         description: 'Herramientas avanzadas para escalar',
-        features: ['Clientes ilimitados', 'Pagos en línea integrados', 'Automatización de mensajes', 'AI Coach Asistente', 'Soporte 24/7'],
+        features: ['Clientes ilimitados', 'Pagos en línea integrados', 'Generador de Rutinas IA', 'Estadísticas de Ingresos', 'Soporte 24/7'],
         isPopular: true,
     }
 ];

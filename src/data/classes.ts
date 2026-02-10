@@ -24,7 +24,7 @@ export const CLASS_DATA: GroupClass[] = [
             { day: 'Lunes', time: '18:00' },
             { day: 'Miércoles', time: '18:00' },
         ],
-        price: 15000,
+        price: 9900,
         locationType: 'Gimnasio',
     },
     {
@@ -76,7 +76,7 @@ export const CLASS_DATA: GroupClass[] = [
             { day: 'Lunes', time: '19:00' },
             { day: 'Viernes', time: '19:00' },
         ],
-        price: 12000,
+        price: 9900,
         locationType: 'Gimnasio',
     },
     {

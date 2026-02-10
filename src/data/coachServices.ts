@@ -10,7 +10,7 @@ export const COACH_SERVICES: CoachService[] = [
         videoUrl: 'https://videos.pexels.com/video-files/4761426/4761426-sd_640_360_25fps.mp4', // Trainer spotting/assisting
         coach: 'Juan Valdez',
         duration: 60,
-        price: 50000,
+        price: 49900,
         locationType: 'Gimnasio',
         availability: [
             { day: 'Lunes', hours: ['08:00', '09:00', '10:00', '14:00', '15:00'] },
@@ -26,7 +26,7 @@ export const COACH_SERVICES: CoachService[] = [
         videoUrl: 'https://videos.pexels.com/video-files/3195968/3195968-sd_640_360_25fps.mp4', // Healthy food preparation
         coach: 'Juan Valdez',
         duration: 45,
-        price: 40000,
+        price: 39900,
         locationType: 'Virtual',
         availability: [
             { day: 'Martes', hours: ['11:00', '12:00'] },
@@ -41,7 +41,7 @@ export const COACH_SERVICES: CoachService[] = [
         videoUrl: 'https://videos.pexels.com/video-files/4259062/4259062-sd_640_360_25fps.mp4', // Home workout / living room exercise
         coach: 'Juan Valdez',
         duration: 60,
-        price: 70000,
+        price: 69900,
         locationType: 'A Domicilio',
         availability: [
             { day: 'Sábado', hours: ['09:00', '10:00', '11:00'] },
