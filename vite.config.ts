@@ -75,7 +75,7 @@ export default defineConfig(({ mode }) => {
     ],
     base: mode === 'production' ? '/Fitness-ProIA/' : '/',
     build: {
-      outDir: 'build_output'
+      outDir: 'dist'
     },
     server: {
       port: 3001,
