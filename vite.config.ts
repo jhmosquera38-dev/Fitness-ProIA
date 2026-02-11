@@ -11,6 +11,13 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
 
+  // Detección dinámica de entorno para la base del app
+  // Si estamos en Vercel o en desarrollo local, la base es raíz (/).
+  // Si estamos compilando para GitHub Pages (sin VERCEL env), usamos el subdirectorio.
+  const isVercel = !!process.env.VERCEL || !!env.VITE_VERCEL;
+  const base = (mode === 'production' && !isVercel) ? '/Fitness-ProIA/' : '/';
+
+  console.log(`[ViteConfig] Mode: ${mode}, Base PATH: ${base}`);
   return {
     root: '.',
     appType: 'spa',
@@ -19,7 +26,7 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         devOptions: {
-          enabled: true, // Reactivated for testing/development
+          enabled: true,
           type: 'module',
         },
         includeAssets: ['favicon.svg', 'robots.txt'],
@@ -30,7 +37,7 @@ export default defineConfig(({ mode }) => {
           theme_color: '#ffffff',
           background_color: '#ffffff',
           display: 'standalone',
-          start_url: mode === 'production' ? '/Fitness-ProIA/' : '/',
+          start_url: base,
           orientation: 'portrait',
           icons: [
             {
@@ -73,7 +80,7 @@ export default defineConfig(({ mode }) => {
         }
       })
     ],
-    base: mode === 'production' ? '/Fitness-ProIA/' : '/',
+    base: base,
     build: {
       outDir: 'dist'
     },
