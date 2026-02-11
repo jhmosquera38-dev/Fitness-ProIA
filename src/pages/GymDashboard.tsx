@@ -14,14 +14,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { gymService, GymMember } from '../services/gymService';
 import { groupClassService } from '../services/groupClassService'; // Import Service
-import { SimpleBarChart } from '../components/charts/SimpleBarChart';
 import { ChecklistWidget } from '../components/ChecklistWidget';
 import { useFeedback } from '../components/FeedbackSystem';
 import { AIGymAdminWidget } from '../components/AIGymAdminWidget';
+import { RevenueAnalysis } from '../components/RevenueAnalysis';
 
-// Local mock for chart data only (until we have real transaction history)
-// Local mock for chart data only (until we have real transaction history)
-const chartData: any[] = []; // Datos vacíos hasta integración real con transacciones
+// Mock data for Revenue Analysis
+const monthlyRevenueData = [
+    { month: 'Ene', subscriptions: 2450000, classes: 420000, inventory: 150000 },
+    { month: 'Feb', subscriptions: 2680000, classes: 380000, inventory: 180000 },
+    { month: 'Mar', subscriptions: 2900000, classes: 510000, inventory: 220000 },
+];
+
+const chartData: any[] = []; // Removed since we use monthlyRevenueData now
 
 // Componente de Tarjeta KPI (Indicador Clave de Rendimiento)
 const KpiCard: React.FC<{ icon: string; value: string | number; label: string; sublabel: string; trend?: 'up' | 'down' | 'neutral' }> = ({ icon, value, label, sublabel, trend }) => (
@@ -300,19 +305,8 @@ export const GymDashboard: React.FC<GymDashboardProps> = ({ onNavigate }) => {
 
                 {/* Columna Izquierda (Datos Principales) */}
                 <div className="lg:col-span-2 space-y-8">
-                    {/* Gráfico Financiero */}
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-lg font-bold text-slate-800 dark:text-white">Rendimiento Financiero</h2>
-                            <select className="bg-slate-50 dark:bg-slate-700 border-none text-xs rounded-md p-2 text-slate-600 dark:text-slate-300 focus:ring-0 cursor-pointer">
-                                <option>Últimos 6 meses</option>
-                                <option>Este Año</option>
-                            </select>
-                        </div>
-                        <div className="h-64">
-                            <SimpleBarChart data={chartData} />
-                        </div>
-                    </div>
+                    {/* Análisis de Ingresos 360° */}
+                    <RevenueAnalysis data={monthlyRevenueData} />
 
                     {/* Tabla de Miembros Recientes */}
                     <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700">
@@ -358,34 +352,47 @@ export const GymDashboard: React.FC<GymDashboardProps> = ({ onNavigate }) => {
                     {/* Asistente IA para Admin */}
                     <AIGymAdminWidget />
 
-                    {/* Alertas de Riesgo (Risk -> Action) */}
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700">
+                    <div id="risk-alerts-section" className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-lg font-bold text-slate-800 dark:text-white">Alertas de Riesgo</h2>
-                            <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">{kpis.atRisk.length}</span>
+                            <h2 className="text-lg font-bold text-slate-800 dark:text-white">Alertas de Retención</h2>
+                            <span className="flex items-center gap-1 text-[10px] font-black text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded-full animate-pulse-slow">
+                                🚨 {kpis.atRisk.length} EN RIESGO
+                            </span>
                         </div>
-                        {kpis.atRisk.length > 0 ? (
-                            <div className="space-y-3">
-                                {kpis.atRisk.map(member => (
-                                    <div key={member.id} className="flex justify-between items-center bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-100 dark:border-red-900/30">
+                        <p className="text-xs text-slate-500 mb-6">Miembros inactivos o con mensualidad vencida.</p>
+
+                        <div className="space-y-4">
+                            {kpis.atRisk.length === 0 ? (
+                                <div className="text-center py-6 bg-green-50/30 dark:bg-green-900/10 rounded-xl border border-dashed border-green-200 dark:border-green-900/30">
+                                    <p className="text-green-600 font-bold text-sm">¡100% de Retención!</p>
+                                    <p className="text-[10px] text-green-500">No hay alertas activas.</p>
+                                </div>
+                            ) : kpis.atRisk.map(member => (
+                                <div key={member.id} className="group p-4 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-100 dark:border-slate-600 hover:border-red-200 dark:hover:border-red-900/50 transition-all">
+                                    <div className="flex justify-between items-start mb-3">
                                         <div>
-                                            <p className="font-bold text-red-800 dark:text-red-300 text-sm">{member.full_name}</p>
-                                            <p className="text-[10px] text-red-600 dark:text-red-400">Venció: {member.last_payment_date}</p>
+                                            <p className="font-bold text-slate-800 dark:text-white text-sm">{member.full_name}</p>
+                                            <p className="text-[10px] text-slate-400">Estado: <span className="text-red-500 font-bold">Vencido</span></p>
                                         </div>
+                                        <div className="p-2 bg-red-100 dark:bg-red-900/10 rounded-lg text-lg">⚠️</div>
+                                    </div>
+                                    <div className="flex gap-2">
                                         <button
-                                            onClick={() => handleOpenRiskModal(member)}
-                                            className="text-xs font-bold text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg transition-colors shadow-sm"
+                                            onClick={() => executeRiskAction(false)}
+                                            className="flex-1 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl text-[10px] uppercase hover:bg-slate-50 transition-colors"
                                         >
-                                            Acción
+                                            Recordar Pago
+                                        </button>
+                                        <button
+                                            onClick={() => executeRiskAction(true)}
+                                            className="flex-1 py-1.5 bg-brand-primary text-white font-bold rounded-xl text-[10px] uppercase hover:bg-brand-secondary transition-colors"
+                                        >
+                                            Recuperar con IA
                                         </button>
                                     </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-4">
-                                <p className="text-green-600 font-medium text-sm">¡Todo en orden!</p>
-                            </div>
-                        )}
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Gestión Rápida de Clases */}

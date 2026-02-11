@@ -206,6 +206,34 @@ export const generateWorkoutPlan = async (profile: UserProfile, dailyStatus?: Da
     }
 };
 
+export const generateCoachRoutine = async (clientData: any, objective: string): Promise<string> => {
+    if (!genAI) return "Error: IA no inicializada.";
+
+    const aiPrompt = `
+        Eres un Mentor de Entrenadores Personales (Coach de Coaches).
+        Tu tarea es generar una rutina técnica y profesional para el siguiente alumno:
+        NOMBRE: ${clientData.name}
+        OBJETIVO: ${objective}
+        PROGRESO ACTUAL: ${clientData.progress}%
+        NOTAS PREVIAS: ${clientData.notes?.join(', ') || 'Ninguna'}
+
+        Genera una sesión de entrenamiento completa (Calentamiento, Parte Principal, Enfriamiento) con series, repeticiones y consejos técnicos.
+        Usa un tono profesional, motivador y estructurado. 
+        Formato: Markdown.
+    `;
+
+    try {
+        return await safeModelExecute(async (modelName) => {
+            const model = genAI!.getGenerativeModel({ model: modelName });
+            const result = await model.generateContent(aiPrompt);
+            return result.response.text();
+        }, { prompt: aiPrompt });
+    } catch (error) {
+        console.error("Error generating coach routine:", error);
+        return "Lo siento, no pude generar la rutina en este momento. Intenta de nuevo.";
+    }
+};
+
 export const generateContextualInsight = async (status: DailyCheckin, userName: string): Promise<AIInsight> => {
     if (!genAI) {
         return {

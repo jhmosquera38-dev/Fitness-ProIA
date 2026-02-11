@@ -248,6 +248,16 @@ export const gymService = {
             .select();
 
         if (error) throw error;
+
+        // REGISTRO FINANCIERO: Log the purchase/addition
+        await this.addTransaction({
+            type: 'Gasto',
+            category: 'Inventario',
+            amount: item.cost * item.stock_quantity,
+            description: `Compra inicial: ${item.name} (x${item.stock_quantity})`,
+            date: new Date().toISOString().split('T')[0]
+        });
+
         return data[0];
     },
 
@@ -259,6 +269,9 @@ export const gymService = {
             .select();
 
         if (error) throw error;
+
+        // If stock increased, log as expense. If sold, we'd ideally log as income, 
+        // but for now we log audit updates.
         return data[0];
     },
 

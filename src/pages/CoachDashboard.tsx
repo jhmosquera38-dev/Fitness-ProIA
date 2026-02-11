@@ -10,8 +10,9 @@
 // ============================================================================
 
 import React, { useState, useEffect } from 'react';
-
 import { User } from '../types';
+import { AICoachRoutineWidget } from '../components/AICoachRoutineWidget';
+import { coachService } from '../services/coachService';
 
 interface CoachDashboardProps {
     user: User;
@@ -83,29 +84,25 @@ export const CoachDashboard: React.FC<CoachDashboardProps> = ({ user, onNavigate
             if (!user) return;
             try {
                 setIsLoading(true);
-                // 1. Fetch Stats (Mocked or Real)
-                // For demo, we might use hardcoded or fetch from DB
-                // const profile = await UserService.getProfile(user.id);
+                // 4. Fetch Clients
+                const clientList = await coachService.fetchMyClients();
+                setClients(clientList);
 
-                // Mock data for now to ensure dashboard renders
-                // Mok data removed to ensure dashboard shows real state
-                setStats({
-                    clients: 0,
-                    income: 0,
-                    rating: 0
-                });
+                // 2. Fetch Services
+                const srvs = await coachService.fetchMyServices();
+                setServices(srvs);
 
-                // 2. Fetch Services (Reset to empty)
-                setServices([]);
+                // 3. Fetch Classes
+                const schedule = await coachService.fetchSchedule();
+                setMyClasses(schedule.filter((i: any) => i.locationType)); // Filter classes (they have locationType)
 
-                // 3. Fetch Classes (Reset to empty)
-                setMyClasses([]);
+                // 1. Stats
+                const statsData = await coachService.getStats();
+                setStats(statsData);
 
-                // 4. Fetch Clients (Reset to empty)
-                setClients([]);
-
-                // 5. Fetch Reviews (Reset to empty)
-                setReviews([]);
+                // 5. Fetch Reviews
+                const revs = await coachService.fetchReviews();
+                setReviews(revs);
 
             } catch (error) {
                 console.error("Error loading coach data:", error);
@@ -267,8 +264,11 @@ export const CoachDashboard: React.FC<CoachDashboardProps> = ({ user, onNavigate
                     </div>
                 </div>
 
-                {/* Columna Lateral: Reseñas */}
+                {/* Columna Lateral: IA y Reseñas */}
                 <div className="space-y-8">
+                    {/* Generador de Rutinas IA */}
+                    <AICoachRoutineWidget clients={clients} />
+
                     <div id="coach-reviews-section" className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-700">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-lg font-bold text-slate-800 dark:text-white">Opiniones</h2>
@@ -291,7 +291,6 @@ export const CoachDashboard: React.FC<CoachDashboardProps> = ({ user, onNavigate
                             ))}
                         </div>
                     </div>
-                    {/* Tarjeta Azul ELIMINADA */}
                 </div>
             </div>
 
@@ -319,8 +318,6 @@ export const CoachDashboard: React.FC<CoachDashboardProps> = ({ user, onNavigate
                     </div>
                 </div>
             )}
-
-
         </div>
     );
 };

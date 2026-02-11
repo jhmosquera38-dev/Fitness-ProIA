@@ -18,23 +18,21 @@ export const authService = {
      * @param accountType - El tipo de cuenta (intent) para persistir tras el redirect.
      */
     loginWithGoogle: async (accountType?: string) => {
-        // Construir URL de redirección base
-        // Detectar si estamos en localhost para forzar la raíz, ignorando el BASE_URL de producción si fuera necesario
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const baseUrl = isLocal ? '/' : (import.meta.env.BASE_URL || '/');
-
-        // Asegurar que la URL sea limpia (sin barras triples)
+        // URL de redirección 100% DINÁMICA
+        // Esto permite que funcione en localhost, con tu IP local (192.168...) o en el repositorio GitHub.
         const origin = window.location.origin;
-        const cleanBase = baseUrl.startsWith('/') ? baseUrl : `/${baseUrl}`;
-        let redirectTo = `${origin}${cleanBase}`.replace(/\/+$/, '/');
+        const path = window.location.pathname;
 
-        // Append intent to URL if provided to persist across redirect
+        // Mantener la estructura limpia, asegurando que termine en / si es la raíz
+        let redirectTo = `${origin}${path}`.replace(/\/$/, '') + '/';
+
+        // Persistir el 'intent' (accountType) en la URL para recuperarlo tras el redirect
         if (accountType) {
-            redirectTo += (redirectTo.includes('?') ? '&' : '?') + `intent=${accountType}`;
+            redirectTo += `?intent=${accountType}`;
         }
 
         console.log("DEBUG: origin =", origin);
-        console.log("DEBUG: baseUrl =", baseUrl);
+        console.log("DEBUG: path =", path);
         console.log("DEBUG: Final redirectTo =", redirectTo);
 
         const { data, error } = await supabase.auth.signInWithOAuth({

@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "start": "remotion preview src/index.ts",
-        "build": "remotion render src/index.ts out/video.mp4"
+        "build": "remotion render src/index.ts CoachDashboardTutorial out/video.mp4"
     },
     "dependencies": {
         "remotion": "4.0.419",

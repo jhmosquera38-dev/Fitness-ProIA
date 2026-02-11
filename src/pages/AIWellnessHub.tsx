@@ -154,10 +154,13 @@ const DailyTip: React.FC = () => {
 // Componente: Prompt Chips (Sugerencias Rápidas)
 const PromptChips: React.FC<{ onSelect: (text: string) => void }> = ({ onSelect }) => {
     const chips = [
-        { emoji: "🏋️", text: "Rutina de 30 min", prompt: "Créame una rutina de cuerpo completo de 30 minutos sin equipo." },
-        { emoji: "🥗", text: "Idea de Cena", prompt: "Dame una opción de cena saludable, alta en proteínas y baja en carbohidratos." },
-        { emoji: "🧘‍♂️", text: "Calmar Ansiedad", prompt: "Me siento ansioso. ¿Puedes guiarme en un ejercicio de respiración breve?" },
-        { emoji: "😴", text: "Mejorar Sueño", prompt: "Tengo problemas para dormir. ¿Qué hábitos me recomiendas para esta noche?" },
+        { emoji: "🏋️", text: "Rutina ràpida", prompt: "Crea una rutina de 15 min para hacer en casa sin equipo." },
+        { emoji: "🥗", text: "Cena ligera", prompt: "Dame una opción de cena saludable, alta en proteínas y baja en carbohidratos." },
+        { emoji: "🧘‍♂️", text: "Relajar mente", prompt: "Me siento estresado. ¿Puedes guiarme en un ejercicio de respiración?" },
+        { emoji: "😴", text: "Dormir mejor", prompt: "Tengo problemas para dormir. ¿Qué hábitos me recomiendas para esta noche?" },
+        { emoji: "⚡", text: "Más Energía", prompt: "¿Qué alimentos o hábitos naturales me recomiendas para tener más energía durante el día?" },
+        { emoji: "🔥", text: "Motivación", prompt: "Dame una frase de motivación y un reto pequeño para hoy." },
+        { emoji: "🥤", text: "Proteína", prompt: "¿Cuánta proteína debo consumir según mi peso y objetivo de ganar músculo?" },
     ];
 
     return (

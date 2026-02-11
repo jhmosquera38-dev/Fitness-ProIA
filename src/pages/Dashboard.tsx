@@ -22,6 +22,7 @@ import { AIGuideWidget } from '../components/AIGuideWidget';
 import { GamificationWidget } from '../components/GamificationWidget';
 import { SocialFeed } from '../components/SocialFeed';
 import { LeaderboardWidget } from '../components/LeaderboardWidget';
+import { WellnessTrendsWidget } from '../components/WellnessTrendsWidget';
 import { generateContextualInsight } from '../services/geminiService';
 import { ACTIVE_CHALLENGES } from '../data/gamification';
 
@@ -57,6 +58,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onNavigate }) => {
     const [leaderboard, setLeaderboard] = useState<any[]>([]);
     const [socialFeed, setSocialFeed] = useState<any[]>([]);
     const [challenges, setChallenges] = useState<any[]>([]); // New state for real challenges
+    const [checkinHistory, setCheckinHistory] = useState<DailyCheckin[]>([]);
     // const [streak, setStreak] = useState(0);
 
     const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +74,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onNavigate }) => {
                 const checkin = await userService.fetchTodayCheckin();
 
                 // 2. Load Stats & Social & Challenges
-                const [, ranking, feed, activeChallenges] = await Promise.all([
+                const [, ranking, feed, activeChallenges, history] = await Promise.all([
                     userService.fetchUserStats(),
                     userService.fetchLeaderboard(),
                     userService.fetchSocialFeed(),
@@ -84,6 +86,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onNavigate }) => {
                 setLeaderboard(ranking);
                 setSocialFeed(feed);
                 setChallenges(activeChallenges);
+                setCheckinHistory(history);
 
                 // Simple streak calc
                 // setStreak(history.length); // Simplification: just count of recent checkins
@@ -126,7 +129,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onNavigate }) => {
             await fetchInsight(fullData);
 
             // Refresh stats to likely update streak
-            await userService.fetchCheckinHistory(7);
+            const history = await userService.fetchCheckinHistory(7);
+            setCheckinHistory(history);
             // setStreak(history.length);
         } catch (error) {
             console.error("Error saving checkin:", error);
@@ -272,11 +276,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, onNavigate }) => {
                 {/* 4. Recomendaciones Inteligentes (Top Entrenadores, Clases) */}
                 {dailyStatus && (
                     <div className="md:col-span-4 lg:col-span-3">
-                        <div className="glass-panel p-6 rounded-2xl border border-slate-700/50 h-full">
-                            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                                <span className="text-brand-primary">✦</span> Recomendado para Hoy
-                            </h2>
-                            <SmartRecommendations status={dailyStatus} onNavigate={onNavigate} />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="md:col-span-2">
+                                <div className="glass-panel p-6 rounded-2xl border border-slate-700/50 h-full">
+                                    <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                        <span className="text-brand-primary">✦</span> Recomendado para Hoy
+                                    </h2>
+                                    <SmartRecommendations status={dailyStatus} onNavigate={onNavigate} />
+                                </div>
+                            </div>
+                            <div className="md:col-span-1">
+                                <WellnessTrendsWidget history={checkinHistory} />
+                            </div>
                         </div>
                     </div>
                 )}
