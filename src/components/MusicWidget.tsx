@@ -69,6 +69,11 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
     const isPlayingRef = useRef(false);
     const catalogRef = useRef<MusicCatalog | null>(null);
     const activeCategoryRef = useRef<keyof MusicCatalog>('cardio_hiit');
+    // Tracks the video ID of the most recent load command, so a delayed/stale
+    // error or watchdog callback from a previous track can't interfere with
+    // whatever the user has since switched to.
+    const pendingVideoIdRef = useRef<string | null>(null);
+    const watchdogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => { currentTrackRef.current = currentTrack; }, [currentTrack]);
     useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
@@ -103,6 +108,13 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
     const playNext = useCallback(() => playTrackAtOffset(1), [playTrackAtOffset]);
     const playPrevious = useCallback(() => playTrackAtOffset(-1), [playTrackAtOffset]);
 
+    const clearWatchdog = useCallback(() => {
+        if (watchdogTimerRef.current) {
+            clearTimeout(watchdogTimerRef.current);
+            watchdogTimerRef.current = null;
+        }
+    }, []);
+
     // Initialize the YouTube player once
     useEffect(() => {
         let cancelled = false;
@@ -117,22 +129,34 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                     onStateChange: (event: any) => {
                         const YTState = (window as any).YT.PlayerState;
                         if (event.data === YTState.ENDED) {
+                            clearWatchdog();
                             playTrackAtOffset(1);
                         } else if (event.data === YTState.PLAYING) {
+                            clearWatchdog();
                             setIsPlaying(true);
                             setStatusMessage(null);
-                        } else if (event.data === YTState.PAUSED) {
-                            setIsPlaying(false);
+                        } else if (event.data === YTState.PAUSED || event.data === YTState.CUED) {
+                            clearWatchdog();
+                            if (event.data === YTState.PAUSED) setIsPlaying(false);
                         }
                     },
                     onError: () => {
+                        // A load can fail asynchronously after the user has already
+                        // switched to a different track; only auto-skip if this
+                        // error still corresponds to the track we're waiting on.
+                        const failedVideoId = pendingVideoIdRef.current;
+                        clearWatchdog();
                         setStatusMessage('Video no disponible, saltando a la siguiente...');
-                        setTimeout(() => playTrackAtOffset(1), 900);
+                        setTimeout(() => {
+                            if (pendingVideoIdRef.current === failedVideoId) {
+                                playTrackAtOffset(1);
+                            }
+                        }, 900);
                     },
                 },
             });
         });
-        return () => { cancelled = true; };
+        return () => { cancelled = true; clearWatchdog(); };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -145,15 +169,36 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
             setTimeout(() => playTrackAtOffset(1), 900);
             return;
         }
-        try {
-            if (isPlaying) {
-                playerRef.current.loadVideoById(youtubeId);
-            } else {
-                playerRef.current.cueVideoById(youtubeId);
+
+        pendingVideoIdRef.current = youtubeId;
+        clearWatchdog();
+
+        const runLoad = () => {
+            try {
+                if (isPlaying) {
+                    playerRef.current.loadVideoById(youtubeId);
+                } else {
+                    playerRef.current.cueVideoById(youtubeId);
+                }
+            } catch (e) {
+                // Retry once shortly after; the underlying iframe may still be
+                // finishing a previous transition.
+                setTimeout(() => {
+                    try { playerRef.current?.loadVideoById(youtubeId); } catch (e2) { /* give up silently */ }
+                }, 400);
             }
-        } catch (e) {
-            // Player not fully ready yet; ignore, next effect run will retry
-        }
+        };
+        runLoad();
+
+        // Watchdog: if the player never confirms this load (no PLAYING/PAUSED/
+        // CUED/ERROR within 6s — e.g. the postMessage bridge to the iframe got
+        // stuck after a rapid track switch), force a single retry.
+        watchdogTimerRef.current = setTimeout(() => {
+            if (pendingVideoIdRef.current === youtubeId) {
+                runLoad();
+            }
+        }, 6000);
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentTrack, playerReady]);
 
