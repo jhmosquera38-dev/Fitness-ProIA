@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { musicService, MusicCatalog, MusicTrack } from '../services/musicService';
 
@@ -30,12 +31,49 @@ const getYoutubeId = (url: string) => {
     return (match && match[2].length === 11) ? match[2] : null;
 };
 
+// YouTube Iframe API loader (loaded once, shared across widget instances)
+let ytApiPromise: Promise<any> | null = null;
+const loadYoutubeApi = (): Promise<any> => {
+    if ((window as any).YT && (window as any).YT.Player) {
+        return Promise.resolve((window as any).YT);
+    }
+    if (ytApiPromise) return ytApiPromise;
+
+    ytApiPromise = new Promise((resolve) => {
+        const prevCallback = (window as any).onYouTubeIframeAPIReady;
+        (window as any).onYouTubeIframeAPIReady = () => {
+            if (typeof prevCallback === 'function') prevCallback();
+            resolve((window as any).YT);
+        };
+        if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+            const tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(tag);
+        }
+    });
+    return ytApiPromise;
+};
+
 export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => {
     const [catalog, setCatalog] = useState<MusicCatalog | null>(null);
     const [activeCategory, setActiveCategory] = useState<keyof MusicCatalog>('cardio_hiit');
     const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
+    const [statusMessage, setStatusMessage] = useState<string | null>(null);
+    const [playerReady, setPlayerReady] = useState(false);
+
+    const playerRef = useRef<any>(null);
+    const playerContainerRef = useRef<HTMLDivElement>(null);
+    const currentTrackRef = useRef<MusicTrack | null>(null);
+    const isPlayingRef = useRef(false);
+    const catalogRef = useRef<MusicCatalog | null>(null);
+    const activeCategoryRef = useRef<keyof MusicCatalog>('cardio_hiit');
+
+    useEffect(() => { currentTrackRef.current = currentTrack; }, [currentTrack]);
+    useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
+    useEffect(() => { catalogRef.current = catalog; }, [catalog]);
+    useEffect(() => { activeCategoryRef.current = activeCategory; }, [activeCategory]);
 
     // Fetch Catalog on mount
     useEffect(() => {
@@ -46,6 +84,94 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
         fetchMusic();
     }, []);
 
+    const playTrackAtOffset = useCallback((offset: number) => {
+        const cat = catalogRef.current;
+        const track = currentTrackRef.current;
+        if (!cat) return;
+        const list = cat[activeCategoryRef.current];
+        if (!list || list.length === 0) return;
+
+        let nextIndex = 0;
+        if (track) {
+            const idx = list.findIndex(t => t.id === track.id);
+            nextIndex = idx === -1 ? 0 : (idx + offset + list.length) % list.length;
+        }
+        setCurrentTrack(list[nextIndex]);
+        setIsPlaying(true);
+    }, []);
+
+    const playNext = useCallback(() => playTrackAtOffset(1), [playTrackAtOffset]);
+    const playPrevious = useCallback(() => playTrackAtOffset(-1), [playTrackAtOffset]);
+
+    // Initialize the YouTube player once
+    useEffect(() => {
+        let cancelled = false;
+        loadYoutubeApi().then((YT) => {
+            if (cancelled || !playerContainerRef.current || playerRef.current) return;
+            playerRef.current = new YT.Player(playerContainerRef.current, {
+                height: '100%',
+                width: '100%',
+                playerVars: { controls: 0, playsinline: 1, rel: 0 },
+                events: {
+                    onReady: () => setPlayerReady(true),
+                    onStateChange: (event: any) => {
+                        const YTState = (window as any).YT.PlayerState;
+                        if (event.data === YTState.ENDED) {
+                            playTrackAtOffset(1);
+                        } else if (event.data === YTState.PLAYING) {
+                            setIsPlaying(true);
+                            setStatusMessage(null);
+                        } else if (event.data === YTState.PAUSED) {
+                            setIsPlaying(false);
+                        }
+                    },
+                    onError: () => {
+                        setStatusMessage('Video no disponible, saltando a la siguiente...');
+                        setTimeout(() => playTrackAtOffset(1), 900);
+                    },
+                },
+            });
+        });
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Load/play the selected track whenever it changes
+    useEffect(() => {
+        if (!playerReady || !playerRef.current || !currentTrack) return;
+        const youtubeId = getYoutubeId(currentTrack.url);
+        if (!youtubeId) {
+            setStatusMessage('Enlace de video inválido, saltando a la siguiente...');
+            setTimeout(() => playTrackAtOffset(1), 900);
+            return;
+        }
+        try {
+            if (isPlaying) {
+                playerRef.current.loadVideoById(youtubeId);
+            } else {
+                playerRef.current.cueVideoById(youtubeId);
+            }
+        } catch (e) {
+            // Player not fully ready yet; ignore, next effect run will retry
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentTrack, playerReady]);
+
+    // Sync play/pause toggle from UI controls to the actual player
+    useEffect(() => {
+        if (!playerReady || !playerRef.current || !currentTrack) return;
+        try {
+            if (isPlaying) {
+                playerRef.current.playVideo();
+            } else {
+                playerRef.current.pauseVideo();
+            }
+        } catch (e) {
+            // ignore
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isPlaying, playerReady]);
+
     const handleTrackClick = (track: MusicTrack) => {
         if (currentTrack?.id === track.id) {
             setIsPlaying(!isPlaying);
@@ -55,15 +181,7 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
         }
     };
 
-
-
     const currentTracks = catalog ? catalog[activeCategory] : [];
-
-    // YouTube Embed URL construction
-    const youtubeId = currentTrack ? getYoutubeId(currentTrack.url) : null;
-    const embedUrl = youtubeId
-        ? `https://www.youtube.com/embed/${youtubeId}?autoplay=${isPlaying ? 1 : 0}&enablejsapi=1&controls=0&loop=1`
-        : '';
 
     // Portal to body
     const [mounted, setMounted] = useState(false);
@@ -97,11 +215,11 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
 
                     {/* Header */}
                     <div className="p-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex justify-between items-center flex-shrink-0">
-                        <div className="flex items-center gap-2">
-                            <div className={`w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center ${isPlaying ? 'animate-pulse shadow-[0_0_10px_rgba(0,255,200,0.5)]' : ''}`}>
+                        <div className="flex items-center gap-2 min-w-0">
+                            <div className={`w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center flex-shrink-0 ${isPlaying ? 'animate-pulse shadow-[0_0_10px_rgba(0,255,200,0.5)]' : ''}`}>
                                 <span className="text-lg">🎵</span>
                             </div>
-                            <div className="flex flex-col">
+                            <div className="flex flex-col min-w-0">
                                 <span className="font-bold text-[11px] md:text-xs tracking-wide">FitnessFlow Music</span>
                                 {currentTrack ? (
                                     <span className="text-[9px] text-brand-primary truncate max-w-[100px] md:max-w-[150px] block">
@@ -112,7 +230,14 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                                 )}
                             </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                            {currentTrack && (
+                                <>
+                                    <button onClick={playPrevious} className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors text-sm" title="Anterior">⏮</button>
+                                    <button onClick={() => setIsPlaying(!isPlaying)} className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors text-sm" title={isPlaying ? 'Pausar' : 'Reproducir'}>{isPlaying ? '⏸' : '▶'}</button>
+                                    <button onClick={playNext} className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors text-sm" title="Siguiente">⏭</button>
+                                </>
+                            )}
                             <button
                                 onClick={() => setIsMinimized(!isMinimized)}
                                 className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors text-lg"
@@ -126,28 +251,22 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                         </div>
                     </div>
 
+                    {/* YouTube Player - stays mounted (even when minimized) so playback continues in the background */}
+                    <div className={`w-full bg-black flex-shrink-0 relative group ${isMinimized || !currentTrack ? 'h-0 overflow-hidden' : 'aspect-video'}`}>
+                        {currentTrack && !isPlaying && (
+                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 pointer-events-none"><span className="text-white text-xs">Pausado</span></div>
+                        )}
+                        {statusMessage && (
+                            <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-20 pointer-events-none">
+                                <span className="text-white text-xs px-3 text-center">{statusMessage}</span>
+                            </div>
+                        )}
+                        <div ref={playerContainerRef} className="w-full h-full" />
+                    </div>
+
                     {/* Content below header - Only visible when NOT minimized */}
                     {!isMinimized && (
                         <>
-                            {/* YouTube Player Container (Visible when playing to comply with TOS, but small/integrated) */}
-                            {youtubeId && (
-                                <div className="w-full aspect-video bg-black flex-shrink-0 relative group">
-                                    {/* Overlay to prevent stealing clicks if needed, or allow interaction */}
-                                    {!isPlaying && <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 pointer-events-none"><span className="text-white text-xs">Pausado</span></div>}
-
-                                    <iframe
-                                        width="100%"
-                                        height="100%"
-                                        src={embedUrl}
-                                        title="YouTube video player"
-                                        frameBorder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                        className="w-full h-full"
-                                    ></iframe>
-                                </div>
-                            )}
-
                             {/* Category Tabs */}
                             <div className="flex overflow-x-auto p-2 gap-2 border-b border-slate-200 dark:border-slate-700 scrollbar-hide flex-shrink-0">
                                 {CATEGORIES.map(cat => (
