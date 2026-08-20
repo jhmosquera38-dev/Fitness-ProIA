@@ -4,6 +4,7 @@ import { TrialBanner } from './TrialBanner';
 import { User, type Theme } from '../types';
 import { FitnessFlowLogo } from './FormIcons';
 import { MusicWidget } from './MusicWidget';
+import { ErrorBoundary } from './ErrorBoundary';
 import { DigitalMemberCard } from './DigitalMemberCard'; // NEW IMPORT
 
 const BellIcon = () => (
@@ -148,7 +149,9 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, theme, onToggleT
                                         <span className="sr-only">Abrir reproductor de música</span>
                                         <MusicNoteIcon className={`transition-transform duration-300 ${isMusicWidgetOpen ? 'animate-pulse' : 'group-hover:rotate-12'}`} />
                                     </button>
-                                    <MusicWidget isOpen={isMusicWidgetOpen} onClose={() => setIsMusicWidgetOpen(false)} />
+                                    <ErrorBoundary>
+                                        <MusicWidget isOpen={isMusicWidgetOpen} onClose={() => setIsMusicWidgetOpen(false)} />
+                                    </ErrorBoundary>
                                 </div>
 
                                 <div className="relative" ref={notificationMenuRef}>

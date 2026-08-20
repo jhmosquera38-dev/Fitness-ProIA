@@ -120,7 +120,24 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
         let cancelled = false;
         loadYoutubeApi().then((YT) => {
             if (cancelled || !playerContainerRef.current || playerRef.current) return;
-            playerRef.current = new YT.Player(playerContainerRef.current, {
+            // IMPORTANT: never hand the YT API a DOM node that React itself
+            // renders/tracks (like playerContainerRef.current directly). The
+            // IFrame API *replaces* whatever element you give it with its own
+            // <iframe>, outside of React's knowledge. If that swapped-out node
+            // is one React still holds a reference to, the next time React
+            // needs to reorder a sibling near it (e.g. toggling the "Pausado"
+            // overlay when switching tracks) it calls insertBefore against a
+            // detached node and crashes with an uncaught
+            // "NotFoundError: ...insertBefore... is not a child of this node",
+            // which — with no error boundary in the app — blanks the whole UI.
+            // So we give YT a plain child <div> that React never renders/owns;
+            // only that throwaway node gets swapped, and React's own ref stays
+            // valid and stable no matter what YT does to its contents.
+            const mountNode = document.createElement('div');
+            mountNode.style.width = '100%';
+            mountNode.style.height = '100%';
+            playerContainerRef.current.appendChild(mountNode);
+            playerRef.current = new YT.Player(mountNode, {
                 height: '100%',
                 width: '100%',
                 playerVars: { controls: 0, playsinline: 1, rel: 0 },
@@ -296,8 +313,11 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                         </div>
                     </div>
 
-                    {/* YouTube Player - stays mounted (even when minimized) so playback continues in the background */}
+                    {/* YouTube Player - stays mounted (even when minimized) so playback continues in the background.
+                        The player mount must stay the FIRST child here and never be reordered/removed by React,
+                        since the underlying <iframe> node is owned by the YouTube API, not React. */}
                     <div className={`w-full bg-black flex-shrink-0 relative group ${isMinimized || !currentTrack ? 'h-0 overflow-hidden' : 'aspect-video'}`}>
+                        <div ref={playerContainerRef} className="w-full h-full" />
                         {currentTrack && !isPlaying && (
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 pointer-events-none"><span className="text-white text-xs">Pausado</span></div>
                         )}
@@ -306,7 +326,6 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                                 <span className="text-white text-xs px-3 text-center">{statusMessage}</span>
                             </div>
                         )}
-                        <div ref={playerContainerRef} className="w-full h-full" />
                     </div>
 
                     {/* Content below header - Only visible when NOT minimized */}
