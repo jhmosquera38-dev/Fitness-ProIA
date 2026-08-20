@@ -153,8 +153,18 @@ export const MusicWidget: React.FC<MusicWidgetProps> = ({ isOpen, onClose }) => 
                             setIsPlaying(true);
                             setStatusMessage(null);
                         } else if (event.data === YTState.PAUSED || event.data === YTState.CUED) {
+                            // Note: we deliberately do NOT set isPlaying=false here.
+                            // loadVideoById() (used when switching tracks) reliably
+                            // emits a transient PAUSED event of the *outgoing* video
+                            // as part of the switch itself — treating that as "the
+                            // user paused" fought against the isPlaying=true we had
+                            // just set for the incoming track, immediately pausing
+                            // it again and requiring a second click to resume. Our
+                            // own pause button already sets isPlaying=false directly
+                            // (see handleTrackClick / the play-pause button), so
+                            // there's no legitimate case that needs this mirrored
+                            // back from the player.
                             clearWatchdog();
-                            if (event.data === YTState.PAUSED) setIsPlaying(false);
                         }
                     },
                     onError: () => {
