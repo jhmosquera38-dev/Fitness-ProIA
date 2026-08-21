@@ -14,6 +14,39 @@ export type MusicCatalog = Record<MusicTrack['category'], MusicTrack[]>;
 
 const DEFAULT_CATALOG: MusicCatalog = {
     cardio_hiit: [
+        { id: 'ch101', title: "What Is Love", artist: "Hitkend House Lab", platform: 'YouTube', url: 'https://www.youtube.com/embed/pJgW-NUeBfQ', category: 'cardio_hiit', bpm: 126 },
+        { id: 'ch102', title: "Zombie", artist: "Hitkend House Lab", platform: 'YouTube', url: 'https://www.youtube.com/embed/Ys4a9i6IoL8', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch103', title: "L'amour Toujours", artist: "Hitkend House Lab", platform: 'YouTube', url: 'https://www.youtube.com/embed/Hytd-JM6A1I', category: 'cardio_hiit', bpm: 128 },
+        { id: 'ch104', title: "Dance Monkey", artist: "Hitkend House Lab", platform: 'YouTube', url: 'https://www.youtube.com/embed/ElBrAaip6GQ', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch105', title: "Wicked Game", artist: "Hitkend House Lab", platform: 'YouTube', url: 'https://www.youtube.com/embed/N0iTckiF0Co', category: 'cardio_hiit', bpm: 122 },
+        { id: 'ch106', title: "Just A Dream", artist: "Paul Lock", platform: 'YouTube', url: 'https://www.youtube.com/embed/stklTVeJR4g', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch107', title: "Remembering Your Touch", artist: "Costa Mee", platform: 'YouTube', url: 'https://www.youtube.com/embed/0yq4WZ81GYU', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch108', title: "Cold Romance", artist: "Paul Lock", platform: 'YouTube', url: 'https://www.youtube.com/embed/0v5cnsN01F8', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch109', title: "Are You Ready Tonight", artist: "Costa Mee", platform: 'YouTube', url: 'https://www.youtube.com/embed/V2z9vosuE0c', category: 'cardio_hiit', bpm: 126 },
+        { id: 'ch110', title: "Do You Wanna Know (Marc Philippe Remix)", artist: "Pete Bellis & Tommy", platform: 'YouTube', url: 'https://www.youtube.com/embed/SsSv3guKB78', category: 'cardio_hiit', bpm: 126 },
+        { id: 'ch111', title: "Around This World", artist: "Costa Mee", platform: 'YouTube', url: 'https://www.youtube.com/embed/BIyTAT9KnqU', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch112', title: "Deep Inside My Mind (Pete Bellis & Tommy Remix)", artist: "Costa Mee", platform: 'YouTube', url: 'https://www.youtube.com/embed/kNhOGhwgJR0', category: 'cardio_hiit', bpm: 126 },
+        { id: 'ch113', title: "Love Of Yesterday", artist: "Paul Lock", platform: 'YouTube', url: 'https://www.youtube.com/embed/xRK9sMWuZbM', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch114', title: "Love In Undercover", artist: "Costa Mee", platform: 'YouTube', url: 'https://www.youtube.com/embed/PSn7riQMMmk', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch115', title: "Don't Walk Away (Paul Lock Remix)", artist: "Costa Mee", platform: 'YouTube', url: 'https://www.youtube.com/embed/KxQoIt7blQk', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch116', title: "Falling for You", artist: "Paul Lock", platform: 'YouTube', url: 'https://www.youtube.com/embed/Sa5lxph4h84', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch117', title: "Hold On", artist: "Housenick", platform: 'YouTube', url: 'https://www.youtube.com/embed/WYSDJsCnyRQ', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch118', title: "Faded (Dj Dark & Dj Vianu Remix)", artist: "Alan Walker", platform: 'YouTube', url: 'https://www.youtube.com/embed/e6QqJv4GJHg', category: 'cardio_hiit', bpm: 126 },
+        { id: 'ch119', title: "Alone (Anthony Keyrouz & Henri Purnell Remix)", artist: "Alan Walker", platform: 'YouTube', url: 'https://www.youtube.com/embed/-f0hoRKBiHo', category: 'cardio_hiit', bpm: 126 },
+        { id: 'ch120', title: "Save Me (SOS)", artist: "Vanessa Campagna", platform: 'YouTube', url: 'https://www.youtube.com/embed/s4Ik8Bay_tw', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch121', title: "Dancer In The Dark (Original Mix)", artist: "Marc Philippe", platform: 'YouTube', url: 'https://www.youtube.com/embed/NwaNvvEWwic', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch122', title: "Back To You (Marc Philippe Remix)", artist: "GeoM", platform: 'YouTube', url: 'https://www.youtube.com/embed/ELGJ0KcTDCs', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch123', title: "You Love Me Tonight (Original Mix)", artist: "Marc Philippe", platform: 'YouTube', url: 'https://www.youtube.com/embed/G49YXNACzh0', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch124', title: "Deepest Blue (Original Mix)", artist: "Marc Philippe", platform: 'YouTube', url: 'https://www.youtube.com/embed/dz9IcngIiD0', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch125', title: "Summer Of Love (Original Mix)", artist: "Marc Philippe", platform: 'YouTube', url: 'https://www.youtube.com/embed/KEwFqFkjn6Q', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch126', title: "Crazy (Deep Universe Release)", artist: "Dj Goja", platform: 'YouTube', url: 'https://www.youtube.com/embed/vyA2oM25OEM', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch127', title: "Tonight", artist: "Tabba x Dj Goja", platform: 'YouTube', url: 'https://www.youtube.com/embed/ZP4wwZZyEUs', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch128', title: "Desert Rose", artist: "Dj Goja x Magic Phase", platform: 'YouTube', url: 'https://www.youtube.com/embed/mjXsFu9f_AU', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch129', title: "Feel Your Lovin", artist: "Costa Mee", platform: 'YouTube', url: 'https://www.youtube.com/embed/Me9Cel3opNU', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch130', title: "Important Story (Original Mix)", artist: "Nando Fortunato", platform: 'YouTube', url: 'https://www.youtube.com/embed/ybNyiaw6OP0', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch131', title: "I Wanna Change (Original Mix)", artist: "Nando Fortunato", platform: 'YouTube', url: 'https://www.youtube.com/embed/ukLDtJK6pFc', category: 'cardio_hiit', bpm: 124 },
+        { id: 'ch132', title: "Are You With Me (Dj Dark & Dj Vianu Remix)", artist: "Easton Corbin", platform: 'YouTube', url: 'https://www.youtube.com/embed/JYP3RBUlvmY', category: 'cardio_hiit', bpm: 126 },
+        { id: 'ch133', title: "Stranger (Original Mix)", artist: "Suprafive & Nesco", platform: 'YouTube', url: 'https://www.youtube.com/embed/rEMjvHIZor8', category: 'cardio_hiit', bpm: 124 },
         { id: 'ch1', title: "I'm Good (Blue)", artist: "David Guetta & Bebe Rexha", platform: 'YouTube', url: 'https://www.youtube.com/embed/90RLzVUuXe4', category: 'cardio_hiit', bpm: 128 },
         { id: 'ch2', title: "Piece Of Your Heart", artist: "Meduza ft. Goodboys", platform: 'YouTube', url: 'https://www.youtube.com/embed/KWjV25q34Hw', category: 'cardio_hiit', bpm: 124 },
         { id: 'ch3', title: "Losing It", artist: "Fisher", platform: 'YouTube', url: 'https://www.youtube.com/embed/o3WdLtpWM_c', category: 'cardio_hiit', bpm: 126 },
@@ -127,9 +160,13 @@ export const musicService = {
     async getCatalog(): Promise<MusicCatalog> {
         try {
             // Intentar cargar de Supabase
+            // Ordenar por id para que el orden de inserción (p.ej. las canciones
+            // marcadas como "iniciales" de una categoría) se preserve siempre,
+            // en vez de depender del orden no garantizado de un SELECT sin ORDER BY.
             const { data, error } = await supabase
                 .from('music_tracks')
-                .select('*');
+                .select('*')
+                .order('id', { ascending: true });
 
             if (error || !data || data.length === 0) {
                 console.warn('Usando catálogo local de música (Supabase vacío o error)');
